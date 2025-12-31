@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
 import { ClipLoader } from 'react-spinners';
 function ForgotPassword() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1) // 1: enter email, 2: enter otp, 3: reset password
   const [email,setEmail]=useState("")
   const [otp,setOtp]=useState("")
   const [newPassword,setNewPassword]=useState("")
@@ -79,8 +79,11 @@ const [loading,setLoading]=useState(false)
           &&
           <div>
  <div className='mb-6'>
-                    <label htmlFor="email" className='block text-gray-700 font-medium mb-1'>OTP</label>
-                    <input type="email" className='w-full border-[1px] border-gray-200 rounded-lg px-3 py-2 focus:outline-none  ' placeholder='Enter OTP' onChange={(e)=>setOtp(e.target.value)} value={otp} required/>
+                    <label  className='block text-gray-700 font-medium mb-1'>OTP</label>
+                    <input type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  maxLength={6} className='w-full border-[1px] border-gray-200 rounded-lg px-3 py-2 focus:outline-none  ' placeholder='Enter OTP' onChange={(e)=>setOtp(e.target.value)} value={otp} required/>
                 </div>
                 <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`} onClick={handleVerifyOtp} disabled={loading}>
                 {loading?<ClipLoader size={20} color='white'/>:"Verify"}
