@@ -3,6 +3,7 @@ import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.routes.js';
+import userRouter from './routes/user.routes.js';
 import cors from 'cors';
 
 
@@ -19,6 +20,7 @@ app.use(cors(
     }
 ));
 app.use('/api/auth',authRouter);
+app.use('/api/user' , user.router);
 
 
 app.listen(PORT, ()=>{
