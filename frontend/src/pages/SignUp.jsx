@@ -4,7 +4,7 @@ import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
-// import { setUserData } from '../redux/userSlice.js'
+import { setUserData } from '../redux/userSlice.js'
 import { serverUrl } from '../App';
 
 import { ClipLoader } from 'react-spinners';
@@ -22,6 +22,7 @@ function SignUp() {
      const [loading,setLoading]=useState(false)
      const [err,setErr]=useState("")
     const [role, setRole] = useState("user")
+    const dispatch=useDispatch()
     const handleSignUp=async () => {
         setLoading(true)
         try {
