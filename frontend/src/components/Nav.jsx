@@ -11,11 +11,11 @@ import { FaPlus } from "react-icons/fa6";
 import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 function Nav() {
-    const { userData, currentCity ,cartItems} = useSelector(state => state.user)
+    
      
     const [showInfo, setShowInfo] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
-    const [query,setQuery]=useState("")
+ 
     const dispatch = useDispatch()
     const navigate=useNavigate()
     const handleLogOut = async () => {
