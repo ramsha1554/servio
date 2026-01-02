@@ -15,8 +15,8 @@ function UserDashboard() {
   const cateScrollRef=useRef()
   const shopScrollRef=useRef()
   const navigate=useNavigate()
-  const [showLeftCateButton,setShowLeftCateButton]=useState(false)
-  const [showRightCateButton,setShowRightCateButton]=useState(false)
+  const [showLeftCateButton,setShowLeftCateButton]=useState(false) // to show left scroll button for categories
+  const [showRightCateButton,setShowRightCateButton]=useState(false) // to show right scroll button for categories
    const [showLeftShopButton,setShowLeftShopButton]=useState(false)
   const [showRightShopButton,setShowRightShopButton]=useState(false)
   const [updatedItemsList,setUpdatedItemsList]=useState([])
@@ -47,8 +47,8 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
   const scrollHandler=(ref,direction)=>{
     if(ref.current){
       ref.current.scrollBy({
-        left:direction=="left"?-200:200,
-        behavior:"smooth"
+        left:direction=="left"?-200:200, // if direction is left scroll -200 else scroll +200
+        behavior:"smooth" // smooth scrolling
       })
     }
   }
@@ -70,7 +70,7 @@ setRightButton(element.scrollLeft+element.clientWidth<element.scrollWidth)
     }
 
     return ()=>{cateScrollRef?.current?.removeEventListener("scroll",()=>{
-        updateButton(cateScrollRef,setShowLeftCateButton,setShowRightCateButton)
+        updateButton(cateScrollRef,setShowLeftCateButton,setShowRightCateButton)// 
       })
          shopScrollRef?.current?.removeEventListener("scroll",()=>{
         updateButton(shopScrollRef,setShowLeftShopButton,setShowRightShopButton)
