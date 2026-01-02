@@ -10,7 +10,19 @@ const userSlice = createSlice({
     shopInMyCity: [],
     itemsInMyCity: [],
     searchItems: [],  
-    cartItems: [],
+    cartItems: [{
+
+id : null ,
+name : null ,
+price : null ,
+image : null ,
+quantity : 0 ,
+shop : null ,
+foodType : null
+
+    }
+     
+    ],
   },
   reducers: {
     setUserData: (state, action) => {
@@ -34,7 +46,10 @@ const userSlice = createSlice({
     ,
     setSearchItems: (state, action) => {
       state.searchItems = action.payload;
-    }
+    } ,
+    addToCart: (state, action) => {
+      state.cartItems.push(action.payload);
+    } 
 
   },
 });
