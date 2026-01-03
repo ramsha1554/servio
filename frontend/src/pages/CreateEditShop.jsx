@@ -31,15 +31,15 @@ function CreateEditShop() {
         e.preventDefault()
         setLoading(true)
         try {
-           const formData=new FormData()  // using FormData to send multipart/form-data as we are sending image
+           const formData=new FormData()
            formData.append("name",name) 
            formData.append("city",city) 
            formData.append("state",state) 
            formData.append("address",address) 
            if(backendImage){
-            formData.append("image",backendImage) // only append image if user has selected a new image
+            formData.append("image",backendImage)
            }
-           const result=await axios.post(`${serverUrl}/api/shop/create-edit`,formData,{withCredentials:true}) // withCredentials to send cookies
+           const result=await axios.post(`${serverUrl}/api/shop/create-edit`,formData,{withCredentials:true})
            dispatch(setMyShopData(result.data))
           setLoading(false)
           navigate("/")
