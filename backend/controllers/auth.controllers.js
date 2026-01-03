@@ -79,7 +79,7 @@ return res.status(200).json({message:"log out successfully"})
 
 export const sendOtp=async (req,res) => {
   try {
-    const {email }=req.body
+    const {email}=req.body
     const user=await User.findOne({email})
     if(!user){
        return res.status(400).json({message:"User does not exist."})
@@ -105,9 +105,8 @@ export const verifyOtp=async (req,res) => {
         }
         user.isOtpVerified=true
         user.resetOtp=undefined
-        user.otpExpires=undefined 
-        await user.save()     //Isse: OTP verify status save ho jaata haiOTP data clear ho jaata hai
-
+        user.otpExpires=undefined
+        await user.save()
         return res.status(200).json({message:"otp verify successfully"})
     } catch (error) {
          return res.status(500).json(`verify otp error ${error}`)
