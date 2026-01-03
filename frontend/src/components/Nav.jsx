@@ -6,16 +6,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RxCross2 } from "react-icons/rx";
 import axios from 'axios';
 import { serverUrl } from '../App';
-
+import { setSearchItems, setUserData } from '../redux/userSlice';
 import { FaPlus } from "react-icons/fa6";
 import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 function Nav() {
-    
-     
+    const { userData, currentCity ,cartItems} = useSelector(state => state.user)
+        const { myShopData} = useSelector(state => state.owner)
     const [showInfo, setShowInfo] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
- 
+    const [query,setQuery]=useState("")
     const dispatch = useDispatch()
     const navigate=useNavigate()
     const handleLogOut = async () => {
@@ -60,7 +60,7 @@ handleSearchItems()
 
 
 
-            <h1 className='text-3xl font-bold mb-2 text-[#ff4d2d]'>Servio</h1>
+            <h1 className='text-3xl font-bold mb-2 text-[#ff4d2d]'>Vingo</h1>
             {userData.role == "user" && <div className='md:w-[60%] lg:w-[40%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] hidden md:flex'>
                 <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                     <FaLocationDot size={25} className=" text-[#ff4d2d]" />
@@ -128,4 +128,3 @@ handleSearchItems()
 
 
 export default Nav
-
