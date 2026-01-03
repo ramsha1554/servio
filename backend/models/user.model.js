@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
         unique:true
     },
     password:{
-        type: String, // not used the required as the user can sign up with google auth
+        type: String, // not used the required because of google login
     },
     mobile:{
         type: String,
