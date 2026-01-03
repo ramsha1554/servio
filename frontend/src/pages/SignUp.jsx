@@ -1,29 +1,32 @@
-import react from 'react';
+import React from 'react'
 import { useState } from 'react';
-import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
-import axios from 'axios'
-import { useDispatch } from 'react-redux'
-import { setUserData } from '../redux/userSlice.js'
+import { FaRegEye } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from 'react-router-dom';
+import axios from "axios"
 import { serverUrl } from '../App';
-
-import { ClipLoader } from 'react-spinners';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { ClipLoader } from "react-spinners"
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice';
 function SignUp() {
-
     const primaryColor = "#ff4d2d";
     const hoverColor = "#e64323";
     const bgColor = "#fff9f6";
     const borderColor = "#ddd";
+    const [showPassword, setShowPassword] = useState(false)
+    const [role, setRole] = useState("user")
+    const navigate=useNavigate()
     const [fullName,setFullName]=useState("")
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
     const [mobile,setMobile]=useState("")
-  const [showPassword, setShowPassword] = useState(false)
-     const [loading,setLoading]=useState(false)
-     const [err,setErr]=useState("")
-    const [role, setRole] = useState("user")
+    const [err,setErr]=useState("")
+    const [loading,setLoading]=useState(false)
     const dispatch=useDispatch()
-    const handleSignUp=async () => {
+     const handleSignUp=async () => {
         setLoading(true)
         try {
             const result=await axios.post(`${serverUrl}/api/auth/signup`,{
@@ -37,7 +40,8 @@ function SignUp() {
              setLoading(false)
         }
      }
-         const handleGoogleAuth=async () => {
+
+     const handleGoogleAuth=async () => {
         if(!mobile){
           return setErr("mobile no is required")
         }
@@ -55,13 +59,12 @@ function SignUp() {
     console.log(error)
   }
      }
-
-    return <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
-
- <div className={`bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px] `} style={{
+    return (
+        <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
+            <div className={`bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px] `} style={{
                 border: `1px solid ${borderColor}`
             }}>
-                <h1 className={`text-3xl font-bold mb-2 `} style={{ color: primaryColor }}>Servio</h1>
+                <h1 className={`text-3xl font-bold mb-2 `} style={{ color: primaryColor }}>Vingo</h1>
                 <p className='text-gray-600 mb-8'> Create your account to get started with delicious food deliveries
                 </p>
 
@@ -126,26 +129,8 @@ function SignUp() {
             </button>
             <p className='text-center mt-6 cursor-pointer' onClick={()=>navigate("/signin")}>Already have an account ?  <span className='text-[#ff4d2d]'>Sign In</span></p>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    </div>;
+        </div>
+    )
 }
-export default SignUp;
+
+export default SignUp
