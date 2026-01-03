@@ -33,8 +33,8 @@ const dispatch=useDispatch()
             </div>
 
             <div className='flex items-start flex-col gap-2 text-gray-600 text-sm'>
-                <p>{data?.deliveryAddress?.text}</p> // detailed address
-                <p className='text-xs text-gray-500'>Lat: {data?.deliveryAddress.latitude} , Lon {data?.deliveryAddress.longitude}</p> // delivery coordinates
+                <p>{data?.deliveryAddress?.text}</p>
+                <p className='text-xs text-gray-500'>Lat: {data?.deliveryAddress.latitude} , Lon {data?.deliveryAddress.longitude}</p>
             </div>
 
             <div className='flex space-x-4 overflow-x-auto pb-2'>
@@ -51,24 +51,23 @@ const dispatch=useDispatch()
 <span className='text-sm'>status: <span className='font-semibold capitalize text-[#ff4d2d]'>{data.shopOrders.status}</span>
 </span>
 
-<select  className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e)=>handleUpdateStatus(data._id,data.shopOrders.shop._id,e.target.value)}> // 
+<select  className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e)=>handleUpdateStatus(data._id,data.shopOrders.shop._id,e.target.value)}>
     <option value="">Change</option>
 <option value="pending">Pending</option>
 <option value="preparing">Preparing</option>
 <option value="out of delivery">Out Of Delivery</option>
-</select>  //
-// select to change order status 
+</select>
 
 </div>
 
 {data.shopOrders.status=="out of delivery" && 
 <div className="mt-3 p-2 border rounded-lg text-sm bg-orange-50 gap-4">
-    {data.shopOrders.assignedDeliveryBoy?<p>Assigned Delivery Boy:</p>:<p>Available Delivery Boys:</p>}  // show heading to indicate assignedDeliveryBoy or availableBoys 
+    {data.shopOrders.assignedDeliveryBoy?<p>Assigned Delivery Boy:</p>:<p>Available Delivery Boys:</p>}
    {availableBoys?.length>0?(
      availableBoys.map((b,index)=>(
         <div className='text-gray-800'>{b.fullName}-{b.mobile}</div>
      ))
-   ):data.shopOrders.assignedDeliveryBoy?<div>{data.shopOrders.assignedDeliveryBoy.fullName}-{data.shopOrders.assignedDeliveryBoy.mobile}</div>:<div>Waiting for delivery boy to accept</div>} // 
+   ):data.shopOrders.assignedDeliveryBoy?<div>{data.shopOrders.assignedDeliveryBoy.fullName}-{data.shopOrders.assignedDeliveryBoy.mobile}</div>:<div>Waiting for delivery boy to accept</div>}
 </div>}
 
 <div className='text-right font-bold text-gray-800 text-sm'>
