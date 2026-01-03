@@ -12,7 +12,7 @@ import { ClipLoader } from 'react-spinners';
 function EditItem() {
     const navigate = useNavigate()
     const { myShopData } = useSelector(state => state.owner)
-  const {itemId}=useParams() // getting itemId from url params
+  const {itemId}=useParams()
    const [currentItem,setCurrentItem]=useState(null)
     const [name, setName] = useState("")
     const [price, setPrice] = useState(0)
