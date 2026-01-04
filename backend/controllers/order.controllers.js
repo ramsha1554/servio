@@ -277,7 +277,7 @@ export const updateOrderStatus = async (req, res) => {
                     const boySocketId = boy.socketId
                     if (boySocketId) {
                         io.to(boySocketId).emit('newAssignment', {
-                            sentTo:boy._id,
+                            sentTo: boy._id,
                             assignmentId: deliveryAssignment._id,
                             orderId: deliveryAssignment.order._id,
                             shopName: deliveryAssignment.shop.name,
@@ -336,14 +336,61 @@ export const updateOrderStatus = async (req, res) => {
 export const getDeliveryBoyAssignment = async (req, res) => {
     try {
         const deliveryBoyId = req.userId
+        const deliveryBoy = await User.findById(deliveryBoyId)
+
+        if (!deliveryBoy || !deliveryBoy.location || deliveryBoy.location.coordinates[0] === 0) {
+            // If no location, fall back to notified assignments or empty
+            // But usually we need location. Let's return notified ones as fallback.
+            const assignments = await DeliveryAssignment.find({
+                brodcastedTo: deliveryBoyId,
+                status: "brodcasted"
+            }).populate("order").populate("shop")
+
+            const formated = assignments.map(a => ({
+                assignmentId: a._id,
+                orderId: a.order._id,
+                shopName: a.shop.name,
+                deliveryAddress: a.order.deliveryAddress,
+                items: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId)).shopOrderItems || [],
+                subtotal: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId))?.subtotal
+            }))
+            return res.status(200).json(formated)
+        }
+
+        const [lon1, lat1] = deliveryBoy.location.coordinates
+
+        // Fetch all broadcasted assignments
         const assignments = await DeliveryAssignment.find({
-            brodcastedTo: deliveryBoyId,
             status: "brodcasted"
         })
             .populate("order")
             .populate("shop")
 
-        const formated = assignments.map(a => ({
+        // Filter by distance (5km)
+        const nearbyAssignments = assignments.filter(a => {
+            if (!a.order || !a.order.deliveryAddress) return false;
+            const { latitude, longitude } = a.order.deliveryAddress
+            if (!latitude || !longitude) return false;
+
+            const lat2 = Number(latitude)
+            const lon2 = Number(longitude)
+
+            const R = 6371e3; // metres
+            const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const x = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+            const d = R * c; // in metres
+
+            return d <= 5000;
+        })
+
+        const formated = nearbyAssignments.map(a => ({
             assignmentId: a._id,
             orderId: a.order._id,
             shopName: a.shop.name,
@@ -419,16 +466,16 @@ export const getCurrentOrder = async (req, res) => {
             })
 
         if (!assignment) {
-            return res.status(400).json({ message: "assignment not found" })
+            return res.status(200).json(null)
         }
         if (!assignment.order) {
-            return res.status(400).json({ message: "order not found" })
+            return res.status(200).json(null)
         }
 
         const shopOrder = assignment.order.shopOrders.find(so => String(so._id) == String(assignment.shopOrderId))
 
         if (!shopOrder) {
-            return res.status(400).json({ message: "shopOrder not found" })
+            return res.status(200).json(null)
         }
 
         let deliveryBoyLocation = { lat: null, lon: null }
@@ -533,51 +580,51 @@ export const verifyDeliveryOtp = async (req, res) => {
     }
 }
 
-export const getTodayDeliveries=async (req,res) => {
+export const getTodayDeliveries = async (req, res) => {
     try {
-        const deliveryBoyId=req.userId
-        const startsOfDay=new Date()
-        startsOfDay.setHours(0,0,0,0)
+        const deliveryBoyId = req.userId
+        const startsOfDay = new Date()
+        startsOfDay.setHours(0, 0, 0, 0)
 
-        const orders=await Order.find({
-           "shopOrders.assignedDeliveryBoy":deliveryBoyId,
-           "shopOrders.status":"delivered",
-           "shopOrders.deliveredAt":{$gte:startsOfDay}
+        const orders = await Order.find({
+            "shopOrders.assignedDeliveryBoy": deliveryBoyId,
+            "shopOrders.status": "delivered",
+            "shopOrders.deliveredAt": { $gte: startsOfDay }
         }).lean()
 
-     let todaysDeliveries=[] 
-     
-     orders.forEach(order=>{
-        order.shopOrders.forEach(shopOrder=>{
-            if(shopOrder.assignedDeliveryBoy==deliveryBoyId &&
-                shopOrder.status=="delivered" &&
-                shopOrder.deliveredAt &&
-                shopOrder.deliveredAt>=startsOfDay
-            ){
-                todaysDeliveries.push(shopOrder)
-            }
+        let todaysDeliveries = []
+
+        orders.forEach(order => {
+            order.shopOrders.forEach(shopOrder => {
+                if (shopOrder.assignedDeliveryBoy == deliveryBoyId &&
+                    shopOrder.status == "delivered" &&
+                    shopOrder.deliveredAt &&
+                    shopOrder.deliveredAt >= startsOfDay
+                ) {
+                    todaysDeliveries.push(shopOrder)
+                }
+            })
         })
-     })
 
-let stats={}
+        let stats = {}
 
-todaysDeliveries.forEach(shopOrder=>{
-    const hour=new Date(shopOrder.deliveredAt).getHours()
-    stats[hour]=(stats[hour] || 0) + 1
-})
+        todaysDeliveries.forEach(shopOrder => {
+            const hour = new Date(shopOrder.deliveredAt).getHours()
+            stats[hour] = (stats[hour] || 0) + 1
+        })
 
-let formattedStats=Object.keys(stats).map(hour=>({
- hour:parseInt(hour),
- count:stats[hour]   
-}))
+        let formattedStats = Object.keys(stats).map(hour => ({
+            hour: parseInt(hour),
+            count: stats[hour]
+        }))
 
-formattedStats.sort((a,b)=>a.hour-b.hour)
+        formattedStats.sort((a, b) => a.hour - b.hour)
 
-return res.status(200).json(formattedStats)
-  
+        return res.status(200).json(formattedStats)
+
 
     } catch (error) {
-        return res.status(500).json({ message: `today deliveries error ${error}` }) 
+        return res.status(500).json({ message: `today deliveries error ${error}` })
     }
 }
 
