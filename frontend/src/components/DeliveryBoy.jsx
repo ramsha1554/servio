@@ -22,6 +22,7 @@ function DeliveryBoy() {
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
+  const [fetchedWithLocation, setFetchedWithLocation] = useState(false)
   useEffect(() => {
     if (!socket || userData.role !== "deliveryBoy") return
     let watchId
@@ -56,9 +57,14 @@ function DeliveryBoy() {
 
 
 
-  const getAssignments = async () => {
+  const getAssignments = async (lat, lng) => {
     try {
-      const result = await axios.get(`${serverUrl}/api/order/get-assignments`, { withCredentials: true })
+      const params = {}
+      if (lat && lng) {
+        params.latitude = lat
+        params.longitude = lng
+      }
+      const result = await axios.get(`${serverUrl}/api/order/get-assignments`, { withCredentials: true, params })
 
       setAvailableAssignments(result.data)
     } catch (error) {
@@ -137,10 +143,21 @@ function DeliveryBoy() {
 
 
   useEffect(() => {
-    getAssignments()
+    if (deliveryBoyLocation) {
+      getAssignments(deliveryBoyLocation.lat, deliveryBoyLocation.lon)
+    } else {
+      getAssignments()
+    }
     getCurrentOrder()
     handleTodayDeliveries()
   }, [userData])
+
+  useEffect(() => {
+    if (deliveryBoyLocation && !fetchedWithLocation) {
+      getAssignments(deliveryBoyLocation.lat, deliveryBoyLocation.lon)
+      setFetchedWithLocation(true)
+    }
+  }, [deliveryBoyLocation, fetchedWithLocation])
   return (
     <div className='w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto'>
       <Nav />
