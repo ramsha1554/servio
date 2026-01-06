@@ -44,7 +44,7 @@ function MyOrders() {
           <div className=' z-[10] ' onClick={() => navigate("/")}>
             <IoIosArrowRoundBack size={35} className='text-[#ff4d2d]' />
           </div>
-          <h1 className='text-2xl font-bold  text-start'>My Orders</h1>
+          <h1 className='text-2xl md:text-3xl font-bold  text-start'>My Orders</h1>
         </div>
         <div className='space-y-6'>
           {myOrders?.map((order, index) => (
