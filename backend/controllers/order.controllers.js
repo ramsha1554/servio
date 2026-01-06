@@ -336,11 +336,19 @@ export const updateOrderStatus = async (req, res) => {
 export const getDeliveryBoyAssignment = async (req, res) => {
     try {
         const deliveryBoyId = req.userId
-        const deliveryBoy = await User.findById(deliveryBoyId)
+        let { latitude, longitude } = req.query
 
-        if (!deliveryBoy || !deliveryBoy.location || deliveryBoy.location.coordinates[0] === 0) {
-            // If no location, fall back to notified assignments or empty
-            // But usually we need location. Let's return notified ones as fallback.
+        // Default to DB location if not provided in query
+        if (!latitude || !longitude) {
+            const deliveryBoy = await User.findById(deliveryBoyId)
+            if (deliveryBoy && deliveryBoy.location && deliveryBoy.location.coordinates[0] !== 0) {
+                longitude = deliveryBoy.location.coordinates[0]
+                latitude = deliveryBoy.location.coordinates[1]
+            }
+        }
+
+        if (!latitude || !longitude) {
+            // Fallback if absolutely no location found
             const assignments = await DeliveryAssignment.find({
                 brodcastedTo: deliveryBoyId,
                 status: "brodcasted"
@@ -357,7 +365,8 @@ export const getDeliveryBoyAssignment = async (req, res) => {
             return res.status(200).json(formated)
         }
 
-        const [lon1, lat1] = deliveryBoy.location.coordinates
+        const lon1 = Number(longitude)
+        const lat1 = Number(latitude)
 
         // Fetch all broadcasted assignments
         const assignments = await DeliveryAssignment.find({
