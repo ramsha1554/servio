@@ -163,12 +163,12 @@ function DeliveryBoy() {
       <Nav />
       <div className='w-full max-w-[800px] flex flex-col gap-5 items-center'>
         <div className='bg-white rounded-2xl shadow-md p-5 flex flex-col justify-start items-center w-[90%] border border-orange-100 text-center gap-2'>
-          <h1 className='text-xl font-bold text-[#ff4d2d]'>Welcome, {userData.fullName}</h1>
+          <h1 className='text-2xl md:text-3xl font-bold text-[#ff4d2d]'>Welcome, {userData.fullName}</h1>
           <p className='text-[#ff4d2d] '><span className='font-semibold'>Latitude:</span> {deliveryBoyLocation?.lat}, <span className='font-semibold'>Longitude:</span> {deliveryBoyLocation?.lon}</p>
         </div>
 
         <div className='bg-white rounded-2xl shadow-md p-5 w-[90%] mb-6 border border-orange-100'>
-          <h1 className='text-lg font-bold mb-3 text-[#ff4d2d] '>Today Deliveries</h1>
+          <h1 className='text-xl md:text-2xl font-bold mb-3 text-[#ff4d2d] '>Today Deliveries</h1>
 
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={todayDeliveries}>
