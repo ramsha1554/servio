@@ -2,7 +2,7 @@ import DeliveryAssignment from "../models/deliveryAssignment.model.js"
 import Order from "../models/order.model.js"
 import Shop from "../models/shop.model.js"
 import User from "../models/user.model.js"
-import { sendDeliveryOtpMail } from "../utils/mail.js"
+import { emailQueue } from "../config/queue.js"
 import RazorPay from "razorpay"
 import dotenv from "dotenv"
 import { count } from "console"
@@ -16,12 +16,7 @@ let instance = new RazorPay({
 export const placeOrder = async (req, res) => {
     try {
         const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body
-        if (cartItems.length == 0 || !cartItems) {
-            return res.status(400).json({ message: "cart is empty" })
-        }
-        if (!deliveryAddress.text || !deliveryAddress.latitude || !deliveryAddress.longitude) {
-            return res.status(400).json({ message: "send complete deliveryAddress" })
-        }
+        // Validation handled by Zod
 
         const groupItemsByShop = {}
 
@@ -554,7 +549,10 @@ export const sendDeliveryOtp = async (req, res) => {
         shopOrder.deliveryOtp = otp
         shopOrder.otpExpires = Date.now() + 5 * 60 * 1000
         await order.save()
-        await sendDeliveryOtpMail(order.user, otp)
+
+        // Add email job to queue
+        await emailQueue.add("send-delivery-otp", { user: order.user, otp });
+
         return res.status(200).json({ message: `Otp sent Successfuly to ${order?.user?.fullName}` })
     } catch (error) {
         return res.status(500).json({ message: `delivery otp error ${error}` })

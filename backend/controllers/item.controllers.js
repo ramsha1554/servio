@@ -1,6 +1,7 @@
 import Item from "../models/item.model.js";
 import Shop from "../models/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
+import redis from "../config/redis.js";
 
 export const addItem = async (req, res) => {
     try {
@@ -24,6 +25,12 @@ export const addItem = async (req, res) => {
             path: "items",
             options: { sort: { updatedAt: -1 } }
         })
+
+        // Invalidate city items cache
+        if (shop.city) {
+            await redis.del(`items:city:${shop.city}`);
+        }
+
         return res.status(201).json(shop)
 
     } catch (error) {
@@ -49,6 +56,12 @@ export const editItem = async (req, res) => {
             path: "items",
             options: { sort: { updatedAt: -1 } }
         })
+
+        // Invalidate city items cache
+        if (shop.city) {
+            await redis.del(`items:city:${shop.city}`);
+        }
+
         return res.status(200).json(shop)
 
     } catch (error) {
@@ -83,6 +96,12 @@ export const deleteItem = async (req, res) => {
             path: "items",
             options: { sort: { updatedAt: -1 } }
         })
+
+        // Invalidate city items cache
+        if (shop.city) {
+            await redis.del(`items:city:${shop.city}`);
+        }
+
         return res.status(200).json(shop)
 
     } catch (error) {
@@ -96,93 +115,98 @@ export const getItemByCity = async (req, res) => {
         if (!city) {
             return res.status(400).json({ message: "city is required" })
         }
+
+        // Check cache
+        const cachedItems = await redis.get(`items:city:${city}`);
+        if (cachedItems) {
+            return res.status(200).json(JSON.parse(cachedItems));
+        }
+
         const shops = await Shop.find({
             city: { $regex: new RegExp(`^${city}$`, "i") }
         }).populate('items')
         if (!shops) {
             return res.status(400).json({ message: "shops not found" })
         }
-        const shopIds=shops.map((shop)=>shop._id)
+        const shopIds = shops.map((shop) => shop._id)
 
-        const items=await Item.find({shop:{$in:shopIds}})
+        const items = await Item.find({ shop: { $in: shopIds } })
+
+        // Set cache
+        await redis.set(`items:city:${city}`, JSON.stringify(items), "EX", 300);
+
         return res.status(200).json(items)
 
     } catch (error) {
- return res.status(500).json({ message: `get item by city error ${error}` })
+        return res.status(500).json({ message: `get item by city error ${error}` })
     }
 }
 
-export const getItemsByShop=async (req,res) => {
+export const getItemsByShop = async (req, res) => {
     try {
-        const {shopId}=req.params
-        const shop=await Shop.findById(shopId).populate("items")
-        if(!shop){
+        const { shopId } = req.params
+        const shop = await Shop.findById(shopId).populate("items")
+        if (!shop) {
             return res.status(400).json("shop not found")
         }
         return res.status(200).json({
-            shop,items:shop.items
+            shop, items: shop.items
         })
     } catch (error) {
-         return res.status(500).json({ message: `get item by shop error ${error}` })
+        return res.status(500).json({ message: `get item by shop error ${error}` })
     }
 }
 
-export const searchItems=async (req,res) => {
+export const searchItems = async (req, res) => {
     try {
-        const {query,city}=req.query
-        if(!query || !city){
+        const { query, city } = req.query
+        if (!query || !city) {
             return null
         }
-        const shops=await Shop.find({
-            city:{$regex:new RegExp(`^${city}$`, "i")}
+        const shops = await Shop.find({
+            city: { $regex: new RegExp(`^${city}$`, "i") }
         }).populate('items')
-        if(!shops){
-            return res.status(400).json({message:"shops not found"})
+        if (!shops) {
+            return res.status(400).json({ message: "shops not found" })
         }
-        const shopIds=shops.map(s=>s._id)
-        const items=await Item.find({
-            shop:{$in:shopIds},
-            $or:[
-              {name:{$regex:query,$options:"i"}},
-              {category:{$regex:query,$options:"i"}}  
+        const shopIds = shops.map(s => s._id)
+        const items = await Item.find({
+            shop: { $in: shopIds },
+            $or: [
+                { name: { $regex: query, $options: "i" } },
+                { category: { $regex: query, $options: "i" } }
             ]
 
-        }).populate("shop","name image")
+        }).populate("shop", "name image")
 
         return res.status(200).json(items)
 
     } catch (error) {
-         return res.status(500).json({ message: `search item  error ${error}` })
+        return res.status(500).json({ message: `search item  error ${error}` })
     }
 }
 
 
-export const rating=async (req,res) => {
+export const rating = async (req, res) => {
     try {
-        const {itemId,rating}=req.body
+        const { itemId, rating } = req.body
 
-        if(!itemId || !rating){
-            return res.status(400).json({message:"itemId and rating is required"})
+        // Validation handled by Zod
+
+        const item = await Item.findById(itemId)
+        if (!item) {
+            return res.status(400).json({ message: "item not found" })
         }
 
-        if(rating<1 || rating>5){
-             return res.status(400).json({message:"rating must be between 1 to 5"})
-        }
+        const newCount = item.rating.count + 1
+        const newAverage = (item.rating.average * item.rating.count + rating) / newCount
 
-        const item=await Item.findById(itemId)
-        if(!item){
-              return res.status(400).json({message:"item not found"})
-        }
-
-        const newCount=item.rating.count + 1
-        const newAverage=(item.rating.average*item.rating.count + rating)/newCount
-
-        item.rating.count=newCount
-        item.rating.average=newAverage
+        item.rating.count = newCount
+        item.rating.average = newAverage
         await item.save()
-return res.status(200).json({rating:item.rating})
+        return res.status(200).json({ rating: item.rating })
 
     } catch (error) {
-         return res.status(500).json({ message: `rating error ${error}` })
+        return res.status(500).json({ message: `rating error ${error}` })
     }
 }
