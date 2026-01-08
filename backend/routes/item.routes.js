@@ -6,14 +6,17 @@ import { upload } from "../middlewares/multer.js"
 
 
 
-const itemRouter=express.Router()
+import { validate } from "../middlewares/validate.js"
+import { ItemSchema } from "../utils/schemas.js"
 
-itemRouter.post("/add-item",isAuth,upload.single("image"),addItem)
-itemRouter.post("/edit-item/:itemId",isAuth,upload.single("image"),editItem)
-itemRouter.get("/get-by-id/:itemId",isAuth,getItemById)
-itemRouter.get("/delete/:itemId",isAuth,deleteItem)
-itemRouter.get("/get-by-city/:city",isAuth,getItemByCity)
-itemRouter.get("/get-by-shop/:shopId",isAuth,getItemsByShop)
-itemRouter.get("/search-items",isAuth,searchItems)
-itemRouter.post("/rating",isAuth,rating)
+const itemRouter = express.Router()
+
+itemRouter.post("/add-item", isAuth, upload.single("image"), validate(ItemSchema.addEdit), addItem)
+itemRouter.post("/edit-item/:itemId", isAuth, upload.single("image"), validate(ItemSchema.addEdit), editItem)
+itemRouter.get("/get-by-id/:itemId", isAuth, getItemById)
+itemRouter.get("/delete/:itemId", isAuth, deleteItem)
+itemRouter.get("/get-by-city/:city", isAuth, getItemByCity)
+itemRouter.get("/get-by-shop/:shopId", isAuth, getItemsByShop)
+itemRouter.get("/search-items", isAuth, searchItems)
+itemRouter.post("/rating", isAuth, validate(ItemSchema.rating), rating)
 export default itemRouter
