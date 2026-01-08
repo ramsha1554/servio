@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
 const shopOrderItemSchema = new mongoose.Schema({
-    item:{
+    item: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Item",
-        required:true
+        required: true
     },
-    name:String,
-    price:Number,
-    quantity:Number
+    name: String,
+    price: Number,
+    quantity: Number
 }, { timestamps: true })
 
 const shopOrderSchema = new mongoose.Schema({
@@ -22,32 +22,32 @@ const shopOrderSchema = new mongoose.Schema({
     },
     subtotal: Number,
     shopOrderItems: [shopOrderItemSchema],
-    status:{
-        type:String,
-        enum:["pending","preparing","out of delivery","delivered"],
-        default:"pending"
+    status: {
+        type: String,
+        enum: ["pending", "preparing", "out of delivery", "delivered"],
+        default: "pending"
     },
-  assignment:{
-     type: mongoose.Schema.Types.ObjectId,
-    ref: "DeliveryAssignment",
-    default:null
-  },
-  assignedDeliveryBoy:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-deliveryOtp:{
-        type:String,
-        default:null
+    assignment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DeliveryAssignment",
+        default: null
     },
-otpExpires:{
-        type:Date,
-        default:null
+    assignedDeliveryBoy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
     },
-deliveredAt:{
-    type:Date,
-    default:null
-}
+    deliveryOtp: {
+        type: String,
+        default: null
+    },
+    otpExpires: {
+        type: Date,
+        default: null
+    },
+    deliveredAt: {
+        type: Date,
+        default: null
+    }
 
 }, { timestamps: true })
 
@@ -66,24 +66,35 @@ const orderSchema = new mongoose.Schema({
         latitude: Number,
         longitude: Number
     },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number],
+            index: '2dsphere'
+        }
+    },
     totalAmount: {
         type: Number
     }
     ,
     shopOrders: [shopOrderSchema],
-    payment:{
-        type:Boolean,
-        default:false
+    payment: {
+        type: Boolean,
+        default: false
     },
-    razorpayOrderId:{
-        type:String,
-        default:""
+    razorpayOrderId: {
+        type: String,
+        default: ""
     },
-   razorpayPaymentId:{
-    type:String,
-       default:""
-   }
+    razorpayPaymentId: {
+        type: String,
+        default: ""
+    }
 }, { timestamps: true })
 
-const Order=mongoose.model("Order",orderSchema)
+const Order = mongoose.model("Order", orderSchema)
 export default Order

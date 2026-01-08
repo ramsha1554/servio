@@ -59,6 +59,10 @@ export const placeOrder = async (req, res) => {
                 user: req.userId,
                 paymentMethod,
                 deliveryAddress,
+                location: {
+                    type: "Point",
+                    coordinates: [Number(deliveryAddress.longitude), Number(deliveryAddress.latitude)]
+                },
                 totalAmount,
                 shopOrders,
                 razorpayOrderId: razorOrder.id,
@@ -76,6 +80,10 @@ export const placeOrder = async (req, res) => {
             user: req.userId,
             paymentMethod,
             deliveryAddress,
+            location: {
+                type: "Point",
+                coordinates: [Number(deliveryAddress.longitude), Number(deliveryAddress.latitude)]
+            },
             totalAmount,
             shopOrders
         })
@@ -363,38 +371,36 @@ export const getDeliveryBoyAssignment = async (req, res) => {
         const lon1 = Number(longitude)
         const lat1 = Number(latitude)
 
-        // Fetch all broadcasted assignments
+        // 1. Find Orders near the delivery boy (5km radius)
+        // Using MongoDB geospatial query which is much faster than JS filtering
+        const nearbyOrders = await Order.find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lon1, lat1]
+                    },
+                    $maxDistance: 5000 // 5km
+                }
+            }
+        }).select("_id");
+
+        const nearbyOrderIds = nearbyOrders.map(o => o._id);
+
+        if (nearbyOrderIds.length === 0) {
+            return res.status(200).json([])
+        }
+
+        // 2. Find Broadcasted Assignments corresponding to these nearby orders
         const assignments = await DeliveryAssignment.find({
-            status: "brodcasted"
+            status: "brodcasted",
+            order: { $in: nearbyOrderIds }
         })
             .populate("order")
             .populate("shop")
 
-        // Filter by distance (5km)
-        const nearbyAssignments = assignments.filter(a => {
-            if (!a.order || !a.order.deliveryAddress) return false;
-            const { latitude, longitude } = a.order.deliveryAddress
-            if (!latitude || !longitude) return false;
-
-            const lat2 = Number(latitude)
-            const lon2 = Number(longitude)
-
-            const R = 6371e3; // metres
-            const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
-            const φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180;
-            const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-            const x = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-            const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-            const d = R * c; // in metres
-
-            return d <= 5000;
-        })
-
-        const formated = nearbyAssignments.map(a => ({
+        // 3. Format result
+        const formated = assignments.map(a => ({
             assignmentId: a._id,
             orderId: a.order._id,
             shopName: a.shop.name,
