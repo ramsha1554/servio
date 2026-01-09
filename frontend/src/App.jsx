@@ -40,15 +40,15 @@ function App() {
 
 
   if (isCheckingAuth) {
-    return <div className='w-full h-screen flex justify-center items-center bg-[#fff9f6]'>
-      <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#ff4d2d]'></div>
+    return <div className='w-full h-screen flex justify-center items-center bg-primary-50'>
+      <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary'></div>
     </div>
   }
 
   return (
     <Suspense fallback={
-      <div className='w-full h-screen flex justify-center items-center bg-[#fff9f6]'>
-        <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#ff4d2d]'></div>
+      <div className='w-full h-screen flex justify-center items-center bg-primary-50'>
+        <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary'></div>
       </div>
     }>
       <Routes>
