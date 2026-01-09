@@ -1,10 +1,15 @@
 @import "tailwindcss";
 
 @theme {
+  /* Typography */
+  --font-sans: 'Outfit', sans-serif;
+
+  /* Animations */
   --animate-fade-in-up: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-float: float 6s ease-in-out infinite;
 
   /* Color Palette Definition */
+
   /* Primary - Brand Orange */
   --color-primary-50: #fff9f6;
   --color-primary-100: #ffe4de;
@@ -12,7 +17,6 @@
   --color-primary-300: #ff9d82;
   --color-primary-400: #ff7052;
   --color-primary-500: #ff4d2d;
-  /* Main Brand Color */
   --color-primary-600: #db2b0d;
   --color-primary-700: #b81f06;
   --color-primary-800: #961b07;
@@ -71,7 +75,7 @@
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(30px) scale(0.95);
+      transform: translateY(20px) scale(0.98);
     }
 
     to {
@@ -88,7 +92,7 @@
     }
 
     50% {
-      transform: translateY(-15px);
+      transform: translateY(-10px);
     }
   }
 }
