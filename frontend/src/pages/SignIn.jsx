@@ -6,12 +6,13 @@ import axios from "axios"
 import { serverUrl } from '../App';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
-import { ClipLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import Card from '../components/ui/Card';
 
 function SignIn() {
-    const primaryColor = "#ff4d2d";
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
     const [email, setEmail] = useState("")
@@ -49,46 +50,42 @@ function SignIn() {
     }
 
     return (
-        <div className='min-h-screen w-full flex items-center justify-center p-4 bg-[#fff9f6] relative overflow-hidden'>
+        <div className='min-h-screen w-full flex items-center justify-center p-4 bg-gray-50 relative overflow-hidden'>
 
             {/* Decorative Background Elements */}
-            <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-[#ff4d2d]/10 rounded-full blur-3xl animate-float pointer-events-none"></div>
-            <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] bg-[#ff4d2d]/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl animate-float pointer-events-none"></div>
+            <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] bg-primary/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }}></div>
 
-            <div className={`bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 md:p-10 border border-gray-100 opacity-0 animate-fade-in-up relative z-10 transform transition-all hover:shadow-[0_20px_60px_-15px_rgba(255,77,45,0.15)]`}>
+            <Card className="w-full max-w-md opacity-0 animate-fade-in-up relative z-10" hoverEffect={true}>
 
                 <div className="text-center mb-10">
-                    <h1 className={`text-4xl font-extrabold mb-3 tracking-tight`} style={{ color: primaryColor }}>Servio</h1>
+                    <h1 className="text-4xl font-extrabold mb-3 tracking-tight text-primary">Servio</h1>
                     <p className='text-gray-500 text-sm font-medium'>Welcome back! Tasty food awaits.</p>
                 </div>
 
-                {/* email */}
-                <div className='mb-6 group'>
-                    <label htmlFor="email" className='block text-gray-700 font-semibold mb-2 text-sm ml-1 transition-colors group-hover:text-[#ff4d2d]'>Email Address</label>
-                    <input
+                <div className='mb-2'>
+                    <Input
+                        label="Email Address"
                         type="email"
-                        className='w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]/20 focus:border-[#ff4d2d] transition-all duration-300 placeholder-gray-400'
-                        placeholder='name@example.com'
-                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@example.com"
                         value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                 </div>
 
-                {/* password*/}
-                <div className='mb-6 group'>
-                    <label htmlFor="password" className='block text-gray-700 font-semibold mb-2 text-sm ml-1 transition-colors group-hover:text-[#ff4d2d]'>Password</label>
+                <div className='mb-6'>
                     <div className='relative'>
-                        <input
-                            type={`${showPassword ? "text" : "password"}`}
-                            className='w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]/20 focus:border-[#ff4d2d] transition-all duration-300 placeholder-gray-400 pr-12'
-                            placeholder='••••••••'
-                            onChange={(e) => setPassword(e.target.value)}
+                        <Input
+                            label="Password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
                             value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                         />
                         <button
-                            className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#ff4d2d] transition-colors cursor-pointer p-1'
+                            className='absolute right-4 top-[38px] text-gray-400 hover:text-primary transition-colors cursor-pointer p-1'
                             onClick={() => setShowPassword(prev => !prev)}
                         >
                             {!showPassword ? <FaRegEye size={18} /> : <FaRegEyeSlash size={18} />}
@@ -97,19 +94,19 @@ function SignIn() {
                 </div>
 
                 <div className='text-right mb-8'>
-                    <span className='text-sm font-semibold cursor-pointer text-gray-500 hover:text-[#ff4d2d] transition-colors' onClick={() => navigate("/forgot-password")}>
+                    <span className='text-sm font-semibold cursor-pointer text-gray-500 hover:text-primary transition-colors' onClick={() => navigate("/forgot-password")}>
                         Forgot Password?
                     </span>
                 </div>
 
-                <button
-                    className={`w-full font-bold py-3.5 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#ff4d2d]/30 text-white cursor-pointer flex items-center justify-center`}
-                    style={{ backgroundColor: primaryColor }}
+                <Button
+                    className="w-full"
                     onClick={handleSignIn}
-                    disabled={loading}
+                    isLoading={loading}
+                    size='lg'
                 >
-                    {loading ? <ClipLoader size={20} color='white' /> : "Sign In"}
-                </button>
+                    Sign In
+                </Button>
 
                 {err && (
                     <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg animate-pulse">
@@ -126,18 +123,19 @@ function SignIn() {
                     </div>
                 </div>
 
-                <button
-                    className='w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl px-4 py-3.5 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 cursor-pointer group'
+                <Button
+                    variant="secondary"
+                    className="w-full group" // Added group class for hover effects on icon if needed, though Button handles it
                     onClick={handleGoogleAuth}
+                    icon={FcGoogle} // Passing component directly
                 >
-                    <FcGoogle size={24} className="group-hover:scale-110 transition-transform duration-300" />
-                    <span className="font-semibold text-gray-700">Sign In with Google</span>
-                </button>
+                    <span className="text-slate-700 group-hover:text-primary transition-colors">Sign In with Google</span>
+                </Button>
 
                 <p className='text-center mt-8 text-gray-600 font-medium'>
-                    New to Servio? <span className='text-[#ff4d2d] font-bold hover:underline cursor-pointer ml-1' onClick={() => navigate("/signup")}>Create account</span>
+                    New to Servio? <span className='text-primary font-bold hover:underline cursor-pointer ml-1' onClick={() => navigate("/signup")}>Create account</span>
                 </p>
-            </div>
+            </Card>
         </div>
     )
 }
