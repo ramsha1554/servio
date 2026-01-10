@@ -20,29 +20,85 @@ function DeliveryBoy() {
   const [otp, setOtp] = useState("")
   const [todayDeliveries, setTodayDeliveries] = useState([])
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null)
+  const [address, setAddress] = useState("Fetching address...")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [fetchedWithLocation, setFetchedWithLocation] = useState(false)
+
+  const getAddress = async (lat, lon) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+
+      if (response.data && response.data.address) {
+        const addr = response.data.address
+
+        // Custom formatting to avoid "City, City District" repetition
+        // We strictly pick the most relevant "human" fields
+
+        const street = addr.road || addr.pedestrian || addr.street || addr.path
+        const area = addr.suburb || addr.neighbourhood || addr.residential || addr.commercial || addr.industrial
+        const localArea = addr.hamlet || addr.village
+        const city = addr.city || addr.town || addr.municipality
+        const state = addr.state
+        const zip = addr.postcode
+
+        // Build array of existing parts
+        let parts = []
+
+        if (addr.house_number) parts.push(addr.house_number)
+        if (addr.building) parts.push(addr.building)
+        if (street) parts.push(street)
+        if (area) parts.push(area)
+        if (localArea && localArea !== city) parts.push(localArea)
+        if (city) parts.push(city)
+        if (state) parts.push(state)
+        if (zip) parts.push(zip)
+
+        // If we still didn't get a good "street" or "area" part, fall back to display_name but slice it
+        if (parts.length < 3 && response.data.display_name) {
+          const simple = response.data.display_name.split(",").slice(0, 3).join(",")
+          setAddress(simple)
+        } else {
+          setAddress(parts.join(", "))
+        }
+
+      } else if (response.data.display_name) {
+        // Fallback: just take the first 3 parts of the long string
+        const simple = response.data.display_name.split(",").slice(0, 3).join(",")
+        setAddress(simple)
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error)
+      setAddress("Address not found")
+    }
+  }
+
   useEffect(() => {
     if (!socket || userData.role !== "deliveryBoy") return
     let watchId
     if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition((position) => {
-        const latitude = position.coords.latitude
-        const longitude = position.coords.longitude
-        setDeliveryBoyLocation({ lat: latitude, lon: longitude })
-        socket.emit('updateLocation', {
-          latitude,
-          longitude,
-          userId: userData._id
-        })
-      }),
-        (error) => {
-          console.log(error)
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const latitude = position.coords.latitude
+          const longitude = position.coords.longitude
+          setDeliveryBoyLocation({ lat: latitude, lon: longitude })
+          getAddress(latitude, longitude)
+          socket.emit('updateLocation', {
+            latitude,
+            longitude,
+            userId: userData._id
+          })
         },
-      {
-        enableHighAccuracy: true
-      }
+        (error) => {
+          console.error("Location error:", error)
+          setAddress("Location permission denied or unavailable")
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 5000
+        }
+      )
     }
 
     return () => {
@@ -164,7 +220,7 @@ function DeliveryBoy() {
       <div className='w-full max-w-[800px] flex flex-col gap-5 items-center'>
         <div className='bg-white rounded-2xl shadow-md p-5 flex flex-col justify-start items-center w-[90%] border border-orange-100 text-center gap-2'>
           <h1 className='text-2xl md:text-3xl font-bold text-[#ff4d2d]'>Welcome, {userData.fullName}</h1>
-          <p className='text-[#ff4d2d] '><span className='font-semibold'>Latitude:</span> {deliveryBoyLocation?.lat}, <span className='font-semibold'>Longitude:</span> {deliveryBoyLocation?.lon}</p>
+          <p className='text-gray-600 text-sm font-medium px-4'><span className='text-[#ff4d2d] font-bold'>Current Location:</span> {address}</p>
         </div>
 
         <div className='bg-white rounded-2xl shadow-md p-5 w-[90%] mb-6 border border-orange-100'>
