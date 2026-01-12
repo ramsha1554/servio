@@ -16,6 +16,7 @@ import { socketHandler } from "./socket.js"
 import "./workers/email.worker.js" // Start email worker for order confirmation 
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
+import logger from "./config/logger.js"
 
 const app = express()
 const server = http.createServer(app)
@@ -61,6 +62,6 @@ app.use("/api/order", orderRouter)
 socketHandler(io)
 server.listen(port, () => {
     connectDb()
-    console.log(`server started at ${port}`)
+    logger.info(`Server started at port ${port}`)
 })
 
