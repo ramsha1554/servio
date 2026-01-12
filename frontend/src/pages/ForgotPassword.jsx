@@ -64,7 +64,7 @@ function ForgotPassword() {
   return (
     <div className='flex w-full items-center justify-center min-h-screen p-4 bg-[#fff9f6] relative overflow-hidden'>
 
-      {/* Decorative Background Elements */}
+      {/* Background Elements */}
       <div className="absolute top-[-50px] left-[-50px] w-[250px] h-[250px] bg-[#ff4d2d]/5 rounded-full blur-3xl animate-float pointer-events-none"></div>
       <div className="absolute bottom-[-50px] right-[-50px] w-[350px] h-[350px] bg-[#ff4d2d]/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '1.5s' }}></div>
 
