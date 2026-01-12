@@ -1,28 +1,34 @@
-import axios from 'axios'
-import React, { useEffect } from 'react'
-import { serverUrl } from '../App'
-import { useDispatch, useSelector } from 'react-redux'
+import { useQuery } from '@tanstack/react-query'
+import { useDispatch } from 'react-redux'
 import { setIsCheckingAuth, setUserData } from '../redux/userSlice'
+import { useEffect } from 'react'
+import axios from 'axios'
+import { serverUrl } from '../App'
 
 function useGetCurrentUser() {
   const dispatch = useDispatch()
-  const { isCheckingAuth } = useSelector(state => state.user)
+
+  const fetchUser = async () => {
+    const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true })
+    return result.data
+  }
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchUser,
+    retry: false, // Fail fast on 401
+    staleTime: 1000 * 60 * 60, // 1 hour
+  })
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        dispatch(setIsCheckingAuth(true))
-        const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true })
-        dispatch(setUserData(result.data))
+    dispatch(setIsCheckingAuth(isLoading))
+  }, [isLoading, dispatch])
 
-      } catch (error) {
-        console.log(error)
-      } finally {
-        dispatch(setIsCheckingAuth(false))
-      }
+  useEffect(() => {
+    if (data) {
+      dispatch(setUserData(data))
     }
-    fetchUser()
-
-  }, [])
+  }, [data, dispatch])
 }
 
 export default useGetCurrentUser
