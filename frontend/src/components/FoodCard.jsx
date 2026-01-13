@@ -41,7 +41,7 @@ function FoodCard({ data }) {
     }
 
     return (
-        <div className='w-[260px] rounded-2xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100 group transform hover:-translate-y-1'>
+        <div className='w-[260px] rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group transform hover:-translate-y-1'>
             <div className='relative w-full h-[180px] bg-gray-50 overflow-hidden'>
                 <div className='absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm text-xs font-bold text-gray-700 z-10'>
                     {data.shop?.name || "Premium Shop"}
