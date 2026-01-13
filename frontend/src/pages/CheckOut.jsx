@@ -28,11 +28,62 @@ function CheckOut() {
   const { cartItems, totalAmount, userData } = useSelector(state => state.user)
   const [addressInput, setAddressInput] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cod")
+
+  // Coupon States
+  const [promoCode, setPromoCode] = useState("")
+  const [appliedDiscount, setAppliedDiscount] = useState(0)
+  const [discountLabel, setDiscountLabel] = useState("")
+  const [couponMsg, setCouponMsg] = useState("")
+  const [deliveryDiscount, setDeliveryDiscount] = useState(false) // For Free Delivery
+
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const apiKey = import.meta.env.VITE_GEOAPIKEY
+
+  // Calculate Fees
   const deliveryFee = totalAmount > 500 ? 0 : 40
-  const AmountWithDeliveryFee = totalAmount + deliveryFee
+  const effectiveDeliveryFee = deliveryDiscount ? 0 : deliveryFee
+  const AmountWithDeliveryFee = totalAmount + effectiveDeliveryFee
+  const finalTotal = Math.max(0, AmountWithDeliveryFee - appliedDiscount) // Ensure non-negative
+
+  const handleApplyCoupon = () => {
+    setCouponMsg("")
+    if (!promoCode) return;
+
+    if (promoCode === "WELCOME50") {
+      // 50% off up to 100
+      const discount = Math.min(100, Math.floor(totalAmount * 0.5));
+      setAppliedDiscount(discount);
+      setDiscountLabel("50% OFF");
+      setDeliveryDiscount(false);
+      setCouponMsg("Coupon WELCOME50 Applied Successfully!");
+    }
+    else if (promoCode === "FREEDEL") {
+      // Free Delivery
+      if (deliveryFee === 0) {
+        setCouponMsg("Free delivery is already applied on orders above ₹500!");
+        return;
+      }
+      setDeliveryDiscount(true);
+      setAppliedDiscount(0); // Only delivery is free
+      setDiscountLabel("Free Delivery");
+      setCouponMsg("Coupon FREEDEL Applied! Delivery is Free.");
+    }
+    else if (promoCode === "PARTY20") {
+      // Flat 20% off
+      const discount = Math.floor(totalAmount * 0.2);
+      setAppliedDiscount(discount);
+      setDiscountLabel("20% OFF");
+      setDeliveryDiscount(false);
+      setCouponMsg("Coupon PARTY20 Applied Successfully!");
+    }
+    else {
+      setCouponMsg("Invalid Coupon Code");
+      setAppliedDiscount(0);
+      setDiscountLabel("");
+      setDeliveryDiscount(false);
+    }
+  }
 
   const onDragEnd = (e) => {
     const { lat, lng } = e.target._latlng
@@ -74,7 +125,7 @@ function CheckOut() {
           latitude: location.lat,
           longitude: location.lon
         },
-        totalAmount: AmountWithDeliveryFee,
+        totalAmount: finalTotal,
         cartItems
       }, { withCredentials: true })
 
@@ -168,8 +219,8 @@ function CheckOut() {
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
             <div
               className={`flex items-center gap-4 rounded-xl border p-5 text-left transition-all duration-300 cursor-pointer ${paymentMethod === "cod"
-                  ? "border-[#ff4d2d] bg-[#ff4d2d]/5 shadow-md ring-1 ring-[#ff4d2d]"
-                  : "border-gray-200 hover:border-[#ff4d2d]/50 hover:bg-gray-50"
+                ? "border-[#ff4d2d] bg-[#ff4d2d]/5 shadow-md ring-1 ring-[#ff4d2d]"
+                : "border-gray-200 hover:border-[#ff4d2d]/50 hover:bg-gray-50"
                 }`}
               onClick={() => setPaymentMethod("cod")}
             >
@@ -184,8 +235,8 @@ function CheckOut() {
 
             <div
               className={`flex items-center gap-4 rounded-xl border p-5 text-left transition-all duration-300 cursor-pointer ${paymentMethod === "online"
-                  ? "border-[#ff4d2d] bg-[#ff4d2d]/5 shadow-md ring-1 ring-[#ff4d2d]"
-                  : "border-gray-200 hover:border-[#ff4d2d]/50 hover:bg-gray-50"
+                ? "border-[#ff4d2d] bg-[#ff4d2d]/5 shadow-md ring-1 ring-[#ff4d2d]"
+                : "border-gray-200 hover:border-[#ff4d2d]/50 hover:bg-gray-50"
                 }`}
               onClick={() => setPaymentMethod("online")}
             >
@@ -215,17 +266,64 @@ function CheckOut() {
               </div>
             ))}
             <div className="border-t border-gray-200 my-4"></div>
+
+            {/* Promo Code Input */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Have a promo code?"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase outline-none focus:border-[#ff4d2d]"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                disabled={appliedDiscount > 0}
+              />
+              {appliedDiscount > 0 ? (
+                <button
+                  className="text-red-500 font-bold text-sm px-4 hover:bg-red-50 rounded-lg transition-colors"
+                  onClick={() => {
+                    setAppliedDiscount(0);
+                    setPromoCode("");
+                    setDiscountLabel("");
+                    setDeliveryDiscount(false);
+                  }}
+                >
+                  Remove
+                </button>
+              ) : (
+                <button
+                  className="bg-gray-800 text-white font-bold text-sm px-4 rounded-lg hover:bg-black transition-colors"
+                  onClick={handleApplyCoupon}
+                >
+                  Apply
+                </button>
+              )}
+            </div>
+            {couponMsg && <p className={`text-xs font-medium ${couponMsg.includes("Applied") ? "text-green-600" : "text-red-500"}`}>{couponMsg}</p>}
+
+            <div className="border-t border-gray-200 my-4"></div>
+
             <div className='flex justify-between font-medium text-gray-600'>
               <span>Subtotal</span>
               <span>₹{totalAmount}</span>
             </div>
             <div className='flex justify-between font-medium text-gray-600'>
               <span>Delivery Fee</span>
-              <span className={deliveryFee === 0 ? "text-green-600" : ""}>{deliveryFee === 0 ? "Free" : `₹${deliveryFee}`}</span>
+              <span className={(deliveryFee === 0 || deliveryDiscount) ? "text-green-600" : ""}>
+                {(deliveryFee === 0 || deliveryDiscount) ? "Free" : `₹${deliveryFee}`}
+              </span>
             </div>
+
+            {/* Discount Row */}
+            {appliedDiscount > 0 && (
+              <div className='flex justify-between font-medium text-green-600 animate-pulse'>
+                <span>Discount ({discountLabel})</span>
+                <span>-₹{appliedDiscount}</span>
+              </div>
+            )}
+
             <div className='flex justify-between text-xl font-extrabold text-[#ff4d2d] pt-4'>
               <span>Total Amount</span>
-              <span>₹{AmountWithDeliveryFee}</span>
+              <span>₹{finalTotal}</span>
             </div>
           </div>
         </section>
