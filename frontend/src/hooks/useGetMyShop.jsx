@@ -19,7 +19,7 @@ function useGetMyshop() {
     queryFn: fetchMyShop,
     // Only fetch if user is logged in AND is an owner otherwise return null
     enabled: !!userData && userData.role === 'owner',
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   })
 
   useEffect(() => {
