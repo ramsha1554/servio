@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import Nav from './NaV.JSX'
 import { categories } from '../category'
 import CategoryCard from './CategoryCard'
-import { FaCircleChevronLeft } from "react-icons/fa6";
-import { FaCircleChevronRight } from "react-icons/fa6";
+import ShopCard from './ShopCard' // Import ShopCard
+import PromoCarousel from './PromoCarousel' // Import PromoCarousel
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa6"; // Cleaner icons
 import { useSelector } from 'react-redux';
 import FoodCard from './FoodCard';
 import { useNavigate } from 'react-router-dom';
@@ -18,20 +19,50 @@ function UserDashboard() {
   const [showLeftShopButton, setShowLeftShopButton] = useState(false)
   const [showRightShopButton, setShowRightShopButton] = useState(false)
   const [updatedItemsList, setUpdatedItemsList] = useState([])
+  const [updatedShopList, setUpdatedShopList] = useState([]) // New State for filtered shops
+  const [selectedCategory, setSelectedCategory] = useState("All") // New State for selected category
+  const [isTransitioning, setIsTransitioning] = useState(false) // State for smooth transitions
 
   const handleFilterByCategory = (category) => {
-    if (category == "All") {
-      setUpdatedItemsList(itemsInMyCity)
-    } else {
-      const filteredList = itemsInMyCity?.filter(i => i.category === category)
-      setUpdatedItemsList(filteredList)
-    }
+    if (category === selectedCategory) return; // Avoid re-triggering current category
 
+    setSelectedCategory(category)
+    setIsTransitioning(true)
+
+    // Delay updates to allow fade-out animation
+    setTimeout(() => {
+      if (category === "All") {
+        setUpdatedItemsList(itemsInMyCity)
+        setUpdatedShopList(shopInMyCity)
+      } else {
+        // 1. Filter Items
+        let filteredItems = itemsInMyCity?.filter(i => {
+          if (category === "Burgers") {
+            return i.category === "Fast Food" && i.name.toLowerCase().includes("burger");
+          }
+          return i.category === category;
+        })
+        setUpdatedItemsList(filteredItems)
+
+        // 2. Filter Shops
+        let filteredShops = shopInMyCity?.filter(shop => {
+          if (category === "Burgers") {
+            // Show shops that have "Fast Food" category if user clicks "Burgers"
+            return shop.categories?.includes("Fast Food");
+          }
+          return shop.categories?.includes(category);
+        })
+        setUpdatedShopList(filteredShops)
+      }
+      setIsTransitioning(false) // End transition
+    }, 200) // 200ms delay matches CSS transition speed
   }
 
+  // Initial Data Load
   useEffect(() => {
     setUpdatedItemsList(itemsInMyCity)
-  }, [itemsInMyCity])
+    setUpdatedShopList(shopInMyCity)
+  }, [itemsInMyCity, shopInMyCity])
 
 
   const updateButton = (ref, setLeftButton, setRightButton) => {
@@ -45,7 +76,7 @@ function UserDashboard() {
   const scrollHandler = (ref, direction) => {
     if (ref.current) {
       ref.current.scrollBy({
-        left: direction == "left" ? -200 : 200,
+        left: direction == "left" ? -300 : 300,
         behavior: "smooth"
       })
     }
@@ -73,77 +104,102 @@ function UserDashboard() {
       })
     }
 
-  }, [categories])
+  }, [categories, shopInMyCity]) // Added shopInMyCity dependency
 
 
   return (
-    <div className='w-full min-h-screen flex flex-col gap-8 items-center bg-[#fff9f6] overflow-y-auto pb-20'>
+    <div className='w-full min-h-screen flex flex-col items-center bg-[#fff9f6] text-gray-800 pb-20'>
       <Nav />
 
-      {searchItems && searchItems.length > 0 && (
-        <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-6 bg-white shadow-xl rounded-2xl mt-4 animate-fade-in-up border border-gray-100'>
-          <h1 className='text-gray-900 text-2xl sm:text-3xl font-extrabold border-b border-gray-100 pb-4 w-full'>
-            Search Results
-          </h1>
-          <div className='w-full h-auto flex flex-wrap gap-6 justify-center'>
-            {searchItems.map((item) => (
-              <FoodCard data={item} key={item._id} />
-            ))}
+      {/* Promo Carousel */}
+      <PromoCarousel />
+
+      {/* Main Content Container with max-width */}
+      <div className="w-full max-w-7xl flex flex-col gap-8 px-4 md:px-8">
+
+        {/* Search Results */}
+        {searchItems && searchItems.length > 0 && (
+          <div className='flex flex-col gap-6 animate-fade-in-up mt-8'>
+            <h2 className='text-3xl font-bold text-gray-900 border-b pb-4'>Search Results</h2>
+            <div className='flex flex-wrap gap-6 justify-center'>
+              {searchItems.map((item) => (
+                <FoodCard data={item} key={item._id} />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Categories Section */}
-      <div className="w-full max-w-6xl flex flex-col gap-5 items-start px-4 md:px-6 animate-fade-in-up">
-        <h1 className='text-gray-800 text-2xl sm:text-3xl font-extrabold tracking-tight'>Inspiration for your first order</h1>
-        <div className='w-full relative group'>
-          {showLeftCateButton && <button className='absolute left-[-15px] top-1/2 -translate-y-1/2 bg-white text-[#ff4d2d] p-2 rounded-full shadow-lg hover:scale-110 transition-transform z-10 border border-gray-100' onClick={() => scrollHandler(cateScrollRef, "left")}><FaCircleChevronLeft size={24} />
-          </button>}
-
-          <div className='w-full flex overflow-x-auto gap-4 pb-4 scrollbar-hide' ref={cateScrollRef} style={{ scrollBehavior: 'smooth' }}>
-            {categories.map((cate, index) => (
-              <CategoryCard name={cate.category} image={cate.image} key={index} onClick={() => handleFilterByCategory(cate.category)} />
-            ))}
+        {/* Categories Section - STICKY */}
+        <section className="flex flex-col gap-4 animate-fade-in-up sticky top-[80px] z-40 bg-[#fff9f6]/95 backdrop-blur-md py-4 -mx-4 px-4 md:-mx-8 md:px-8 border-b border-orange-100/50 shadow-sm">
+          <div className='flex justify-between items-end'>
+            <h2 className='text-xl md:text-2xl font-bold tracking-tight text-gray-900'>What's on your mind?</h2>
           </div>
 
-          {showRightCateButton && <button className='absolute right-[-15px] top-1/2 -translate-y-1/2 bg-white text-[#ff4d2d] p-2 rounded-full shadow-lg hover:scale-110 transition-transform z-10 border border-gray-100' onClick={() => scrollHandler(cateScrollRef, "right")}>
-            <FaCircleChevronRight size={24} />
-          </button>}
-        </div>
-      </div>
+          <div className='relative group'>
+            {showLeftCateButton && <button className='absolute left-0 top-1/2 -translate-y-1/2 -ml-4 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:text-[#ff4d2d] transition-all z-10 border border-gray-100 flex items-center justify-center' onClick={() => scrollHandler(cateScrollRef, "left")}><FaChevronLeft size={16} /></button>}
 
-      {/* Best Shops Section */}
-      <div className='w-full max-w-6xl flex flex-col gap-5 items-start px-4 md:px-6 animate-fade-in-up' style={{ animationDelay: '0.1s' }}>
-        <h1 className='text-gray-800 text-2xl sm:text-3xl font-extrabold tracking-tight'>Best Shops in {currentCity}</h1>
-        <div className='w-full relative group'>
-          {showLeftShopButton && <button className='absolute left-[-15px] top-1/2 -translate-y-1/2 bg-white text-[#ff4d2d] p-2 rounded-full shadow-lg hover:scale-110 transition-transform z-10 border border-gray-100' onClick={() => scrollHandler(shopScrollRef, "left")}><FaCircleChevronLeft size={24} />
-          </button>}
+            <div className='flex overflow-x-auto gap-6 pb-2 pt-2 scrollbar-hide px-2' ref={cateScrollRef}>
+              {categories.map((cate, index) => (
+                <CategoryCard
+                  name={cate.category}
+                  image={cate.image}
+                  key={index}
+                  isActive={selectedCategory === cate.category}
+                  onClick={() => handleFilterByCategory(cate.category)}
+                />
+              ))}
+            </div>
 
-          <div className='w-full flex overflow-x-auto gap-6 pb-4 scrollbar-hide' ref={shopScrollRef}>
-            {shopInMyCity?.map((shop, index) => (
-              <CategoryCard name={shop.name} image={shop.image} key={index} onClick={() => navigate(`/shop/${shop._id}`)} />
-            ))}
+            {showRightCateButton && <button className='absolute right-0 top-1/2 -translate-y-1/2 -mr-4 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:text-[#ff4d2d] transition-all z-10 border border-gray-100 flex items-center justify-center' onClick={() => scrollHandler(cateScrollRef, "right")}><FaChevronRight size={16} /></button>}
           </div>
+        </section>
 
-          {showRightShopButton && <button className='absolute right-[-15px] top-1/2 -translate-y-1/2 bg-white text-[#ff4d2d] p-2 rounded-full shadow-lg hover:scale-110 transition-transform z-10 border border-gray-100' onClick={() => scrollHandler(shopScrollRef, "right")}>
-            <FaCircleChevronRight size={24} />
-          </button>}
-        </div>
+        {/* Best Shops Section */}
+        <section className='flex flex-col gap-6 animate-fade-in-up' style={{ animationDelay: '0.1s' }}>
+          <h2 className='text-2xl md:text-3xl font-bold tracking-tight text-gray-900'>Top restaurants in {currentCity}</h2>
+
+          <div className='relative group'>
+            {showLeftShopButton && <button className='absolute left-0 top-1/2 -translate-y-1/2 -ml-4 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:text-[#ff4d2d] transition-all z-10 border border-gray-100 flex items-center justify-center' onClick={() => scrollHandler(shopScrollRef, "left")}><FaChevronLeft size={16} /></button>}
+
+            <div
+              className={`flex overflow-x-auto gap-6 pb-8 pt-2 scrollbar-hide px-2 transition-opacity duration-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+              ref={shopScrollRef}
+            >
+              {updatedShopList?.length > 0 ? (
+                updatedShopList.map((shop, index) => (
+                  <ShopCard shop={shop} key={index} onClick={() => navigate(`/shop/${shop._id}`)} />
+                ))
+              ) : (
+                !isTransitioning && selectedCategory !== "All" && (
+                  <div className="w-full text-center py-10 text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
+                    No restaurants found for "{selectedCategory}" in {currentCity}
+                  </div>
+                )
+              )}
+            </div>
+
+            {showRightShopButton && <button className='absolute right-0 top-1/2 -translate-y-1/2 -mr-4 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:text-[#ff4d2d] transition-all z-10 border border-gray-100 flex items-center justify-center' onClick={() => scrollHandler(shopScrollRef, "right")}><FaChevronRight size={16} /></button>}
+          </div>
+        </section>
+
+        {/* Suggested Items Section */}
+        <section className='flex flex-col gap-6 pb-12 animate-fade-in-up' style={{ animationDelay: '0.2s' }}>
+          <h2 className='text-2xl md:text-3xl font-bold tracking-tight text-gray-900'>Suggested for you</h2>
+
+          <div className={`flex flex-wrap gap-x-6 gap-y-8 justify-center md:justify-start transition-opacity duration-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+            {updatedItemsList?.length > 0 ? (
+              updatedItemsList.map((item, index) => (
+                <FoodCard key={index} data={item} />
+              ))
+            ) : (
+              !isTransitioning && (
+                <div className="text-gray-500">Select a category to see items</div>
+              )
+            )}
+          </div>
+        </section>
+
       </div>
-
-      {/* Suggested Items Section */}
-      <div className='w-full max-w-7xl flex flex-col gap-6 items-center px-4 md:px-6 pb-10 animate-fade-in-up' style={{ animationDelay: '0.2s' }}>
-        <h1 className='text-gray-800 text-2xl sm:text-3xl font-extrabold tracking-tight self-start'>
-          Suggested Food Items
-        </h1>
-
-        <div className='w-full h-auto flex flex-wrap gap-x-6 gap-y-8 justify-center'>
-          {updatedItemsList?.map((item, index) => (
-            <FoodCard key={index} data={item} />
-          ))}
-        </div>
-      </div>
-
     </div>
   )
 }
