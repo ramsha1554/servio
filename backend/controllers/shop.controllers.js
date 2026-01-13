@@ -15,11 +15,11 @@ export const createEditShop = async (req, res) => {
 
         if (!shop) {
             shop = await Shop.create({
-                name, city, state, address, image, owner: req.userId
+                name, city, state, address, image, owner: req.userId, categories: req.body.categories, location: req.body.location
             })
         } else {
             shop = await Shop.findByIdAndUpdate(shop._id, {
-                name, city, state, address, image, owner: req.userId
+                name, city, state, address, image, owner: req.userId, categories: req.body.categories, location: req.body.location
             }, { new: true })
         }
 
@@ -41,13 +41,16 @@ export const createEditShop = async (req, res) => {
 
 export const getMyShop = async (req, res) => {
     try {
+        console.log("Fetching shop for Owner ID:", req.userId);
         const shop = await Shop.findOne({ owner: req.userId }).populate("owner").populate({
             path: "items",
             options: { sort: { updatedAt: -1 } }
         })
         if (!shop) {
+            console.log("Shop NOT found for this owner.");
             return null
         }
+        console.log("Shop Found:", shop.name);
         return res.status(200).json(shop)
     } catch (error) {
         return res.status(500).json({ message: `get my shop error ${error}` })
