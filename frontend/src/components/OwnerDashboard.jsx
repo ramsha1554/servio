@@ -1,17 +1,23 @@
 import React from 'react'
 import Nav from './NaV.JSX'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import axios from 'axios'
+import { serverUrl } from '../App'
 import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from "react-icons/fa";
 import OwnerItemCard from './ownerItemCard';
 function OwnerDashboard() {
   const { myShopData } = useSelector(state => state.owner)
+  const { userData } = useSelector(state => state.user)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
 
 
   return (
     <div className='w-full min-h-screen bg-[#fff9f6] flex flex-col items-center'>
+
       <Nav />
       {!myShopData &&
         <div className='flex justify-center items-center p-4 sm:p-6'>
