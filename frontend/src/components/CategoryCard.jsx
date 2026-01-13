@@ -1,12 +1,17 @@
 import React from 'react'
 
-function CategoryCard({name,image,onClick}) {
+function CategoryCard({ name, image, onClick, isActive }) {
   return (
-    <div className='w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-2xl border-2 border-[#ff4d2d] shrink-0 overflow-hidden bg-white shadow-xl shadow-gray-200 hover:shadow-lg transition-shadow relative' onClick={onClick}>
-     <img src={image} alt="" className=' w-full h-full object-cover transform hover:scale-110 transition-transform duration-300'/>
-     <div className='absolute  bottom-0 w-full left-0  bg-[#ffffff96] bg-opacity-95 px-3 py-1 rounded-t-xl text-center shadow text-sm font-medium text-gray-800 backdrop-blur'>
-{name}
-     </div>
+    <div
+      className='group flex flex-col items-center gap-3 cursor-pointer transition-transform duration-200 active:scale-95 select-none'
+      onClick={onClick}
+    >
+      <div className={`w-[100px] h-[100px] md:w-[120px] md:h-[120px] rounded-full overflow-hidden shadow-md group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 border-2 border-white ring-2 ${isActive ? 'ring-[#ff4d2d] scale-105 shadow-lg' : 'ring-gray-100 group-hover:ring-[#ff4d2d]'}`}>
+        <img src={image} alt={name} className='w-full h-full object-cover' />
+      </div>
+      <span className={`text-sm md:text-base font-semibold transition-colors text-center ${isActive ? 'text-[#ff4d2d]' : 'text-gray-700 group-hover:text-[#ff4d2d]'}`}>
+        {name}
+      </span>
     </div>
   )
 }
