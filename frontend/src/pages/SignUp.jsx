@@ -28,7 +28,8 @@ function SignUp() {
     const theme = {
         user: { color: "text-primary", bg: "bg-primary" },
         owner: { color: "text-accent", bg: "bg-accent" },
-        deliveryBoy: { color: "text-secondary", bg: "bg-secondary" }
+        deliveryBoy: { color: "text-secondary", bg: "bg-secondary" },
+        admin: { color: "text-slate-900", bg: "bg-slate-900" }
     }
     const currentTheme = theme[role]
 
@@ -130,13 +131,14 @@ function SignUp() {
                 <div className='mb-8'>
                     <label className='block text-gray-700 font-semibold mb-2 text-sm ml-1'>I am a</label>
                     <div className='flex gap-2 p-1 bg-gray-50 rounded-xl border border-gray-200'>
-                        {["user", "owner", "deliveryBoy"].map((r) => {
+                        {["user", "owner", "deliveryBoy", "admin"].map((r) => {
                             const isActive = role === r;
                             // Mapping active/inactive states manually for custom role coloring
                             let activeClass = "";
                             if (r === 'user') activeClass = "bg-primary text-white shadow-md";
                             if (r === 'owner') activeClass = "bg-accent text-white shadow-md";
                             if (r === 'deliveryBoy') activeClass = "bg-secondary text-white shadow-md";
+                            if (r === 'admin') activeClass = "bg-slate-900 text-white shadow-md";
 
                             return (
                                 <button

@@ -7,8 +7,8 @@ export const UserSchema = {
         email: z.string().email("Invalid email address"),
         password: z.string().min(6, "Password must be at least 6 characters"),
         mobile: z.string().min(10, "Mobile number must be at least 10 digits"),
-        role: z.enum(["user", "owner", "deliveryBoy"], {
-            errorMap: () => ({ message: "Role must be user, owner, or deliveryBoy" })
+        role: z.enum(["user", "owner", "deliveryBoy", "admin"], {
+            errorMap: () => ({ message: "Role must be user, owner, deliveryBoy, or admin" })
         })
     }),
     signIn: z.object({
@@ -24,7 +24,7 @@ export const UserSchema = {
         email: z.string().email(),
         fullName: z.string().optional(),
         mobile: z.string().optional(),
-        role: z.enum(["user", "owner", "deliveryBoy"]).optional()
+        role: z.enum(["user", "owner", "deliveryBoy", "admin"]).optional()
     }),
     sendOtp: z.object({
         email: z.string().email("Invalid email address")
