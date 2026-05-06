@@ -115,7 +115,7 @@ const Users = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${getRoleStyle(user.role)}`}>
-                          {user.fullName.charAt(0).toUpperCase()}
+                          {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <span className="text-sm font-bold text-gray-900">{user.fullName}</span>
                       </div>

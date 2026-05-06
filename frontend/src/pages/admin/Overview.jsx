@@ -42,7 +42,7 @@ const Overview = () => {
   useEffect(() => {
     if (!userData) return;
     
-    const socket = io(serverUrl);
+    const socket = io(serverUrl, { withCredentials: true });
     
     socket.on('connect', () => {
       socket.emit('identity', { userId: userData._id, role: userData.role });

@@ -25,7 +25,7 @@ export const useAdminShops = () => {
 
   const deleteShop = useMutation({
     mutationFn: async (shopId) => {
-      const res = await axios.delete(`${serverUrl}/api/admin/shops/${shopId}`, { withCredentials: true });
+      const res = await axios.delete(`${serverUrl}/api/admin/shops/${shopId}/remove`, { withCredentials: true });
       return res.data;
     },
     onSuccess: () => {

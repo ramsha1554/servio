@@ -68,6 +68,9 @@ function App() {
         
         {/* Admin Routes */}
         <Route path='/admin/*' element={userData?.role === 'admin' ? <AdminDashboard /> : <Navigate to={"/"} />} />
+        
+        {/* Catch-All 404 Route */}
+        <Route path='*' element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
   )

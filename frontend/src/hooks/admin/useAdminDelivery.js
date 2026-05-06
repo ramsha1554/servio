@@ -9,7 +9,7 @@ export const useAdminDelivery = () => {
   const getDeliveryBoys = useQuery({
     queryKey: ['adminDeliveryBoys'],
     queryFn: async () => {
-      const res = await axios.get(`${serverUrl}/api/admin/delivery`, { withCredentials: true });
+      const res = await axios.get(`${serverUrl}/api/admin/delivery-boys`, { withCredentials: true });
       return res.data;
     },
     enabled: userData?.role === 'admin'
