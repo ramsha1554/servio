@@ -9,8 +9,13 @@ function useGetCurrentUser() {
   const dispatch = useDispatch()
 
   const fetchUser = async () => {
-    const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true })
-    return result.data
+    try {
+      const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true })
+      return result.data
+    } catch (error) {
+      if (error.response && error.response.status === 401) return null;
+      throw error;
+    }
   }
 
   const { data, isLoading, isError } = useQuery({
