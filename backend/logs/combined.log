@@ -90,3 +90,5 @@
 {"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T10:26:12.321Z"}
 {"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T10:26:13.266Z"}
 {"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T10:26:25.510Z"}
+{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T10:26:27.643Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T10:26:32.991Z"}
