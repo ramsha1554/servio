@@ -3,11 +3,14 @@ import User from "./models/user.model.js"
 export const socketHandler = (io) => {
   io.on('connection', (socket) => {
     console.log(socket.id)
-    socket.on('identity', async ({ userId }) => {
+    socket.on('identity', async ({ userId, role }) => {
       try {
         const user = await User.findByIdAndUpdate(userId, {
           socketId: socket.id, isOnline: true
         }, { new: true })
+        if (role === 'admin' || user?.role === 'admin') {
+          socket.join('admin_room');
+        }
       } catch (error) {
         console.log(error)
       }

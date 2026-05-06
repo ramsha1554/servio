@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../../redux/userSlice';
+import axios from 'axios';
+import { serverUrl } from '../../App';
 
 import Overview from './Overview';
 import UsersPage from './Users';
@@ -17,24 +19,29 @@ const AdminDashboard = () => {
   const dispatch = useDispatch();
   const { userData } = useSelector(state => state.user);
 
-  const handleLogout = () => {
-    dispatch(setUserData(null));
-    window.location.href = '/';
+  const handleLogout = async () => {
+    try {
+      await axios.get(`${serverUrl}/api/auth/signout`, { withCredentials: true });
+      dispatch(setUserData(null));
+      window.location.href = '/signin';
+    } catch (e) {
+      console.error("Logout failed", e);
+    }
   };
 
   const navItemClass = ({ isActive }) =>
-    `flex items-center gap-3 px-3 py-2 text-[12px] transition-colors ${
+    `flex items-center gap-3 px-3 py-2 text-[13px] font-medium transition-all ${
       isActive 
-        ? 'bg-[#ffffff] text-[#18181b] font-medium border-[0.5px] border-[#e5e5e2] rounded-[6px]' 
-        : 'text-[#71717a] hover:bg-[#eeeeec] rounded-[6px] border-[0.5px] border-transparent'
+        ? 'bg-primary text-white shadow-md rounded-[8px]' 
+        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded-[8px]'
     }`;
 
   const renderNavSection = (title, items) => (
-    <div className="mb-4">
-      <div className="text-[10px] uppercase tracking-[0.08em] text-[#a1a1aa] px-3 mb-2 font-medium">
+    <div className="mb-6">
+      <div className="text-[11px] uppercase tracking-wider text-gray-400 px-3 mb-3 font-bold">
         {title}
       </div>
-      <div className="space-y-[2px]">
+      <div className="space-y-1">
         {items.map((item) => (
           <NavLink key={item.path} to={item.path} className={navItemClass}>
             {item.icon}
@@ -46,54 +53,58 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="flex h-screen bg-[#fafaf9] font-sans">
+    <div className="flex h-screen bg-gray-50 font-sans">
       
       {/* SIDEBAR */}
-      <aside className="w-[200px] bg-[#f5f5f3] border-r-[0.5px] border-[#e5e5e2] flex flex-col pt-[16px] px-[10px] pb-[16px]">
+      <aside className="w-[240px] bg-white border-r border-gray-200 flex flex-col pt-6 px-4 pb-6 shadow-sm z-20">
         
         {/* Logo Area */}
-        <div className="flex items-center gap-3 px-3 pb-[16px] mb-4 border-b-[0.5px] border-[#e5e5e2]">
-          <div className="w-[26px] h-[26px] bg-[#18181b] rounded-[6px] flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 px-2 pb-6 mb-6 border-b border-gray-100">
+          <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
             <Zap className="w-4 h-4 text-white fill-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[13px] font-medium text-[#18181b] leading-tight">Servio</span>
-            <span className="text-[9px] text-[#71717a] bg-[#e4e4e7] px-[4px] py-[1px] rounded-[4px] w-fit mt-[2px]">Admin</span>
+            <span className="text-sm font-bold text-gray-900 leading-none">Servio</span>
+            <span className="text-[10px] text-primary font-semibold tracking-wide uppercase mt-1">Admin Portal</span>
           </div>
         </div>
         
         {/* Navigation */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           {renderNavSection('OVERVIEW', [
-            { name: 'Dashboard', path: '/admin/overview', icon: <LayoutDashboard size={14} /> },
-            { name: 'Analytics', path: '/admin/analytics', icon: <TrendingUp size={14} /> },
+            { name: 'Dashboard', path: '/admin/overview', icon: <LayoutDashboard size={18} /> },
+            { name: 'Analytics', path: '/admin/analytics', icon: <TrendingUp size={18} /> },
           ])}
 
           {renderNavSection('MANAGE', [
-            { name: 'Users', path: '/admin/users', icon: <Users size={14} /> },
-            { name: 'Shops', path: '/admin/shops', icon: <Store size={14} /> },
-            { name: 'Orders', path: '/admin/orders', icon: <ShoppingBag size={14} /> },
-            { name: 'Delivery', path: '/admin/delivery', icon: <Bike size={14} /> },
+            { name: 'Users', path: '/admin/users', icon: <Users size={18} /> },
+            { name: 'Shops', path: '/admin/shops', icon: <Store size={18} /> },
+            { name: 'Orders', path: '/admin/orders', icon: <ShoppingBag size={18} /> },
+            { name: 'Delivery', path: '/admin/delivery', icon: <Bike size={18} /> },
           ])}
 
           {renderNavSection('PLATFORM', [
-            { name: 'Moderation', path: '/admin/moderation', icon: <ShieldCheck size={14} /> },
-            { name: 'Settings', path: '/admin/settings', icon: <Settings size={14} /> },
+            { name: 'Moderation', path: '/admin/moderation', icon: <ShieldCheck size={18} /> },
+            { name: 'Settings', path: '/admin/settings', icon: <Settings size={18} /> },
           ])}
         </div>
 
-        {/* Footer */}
-        <div className="mt-auto pt-[16px] border-t-[0.5px] border-[#e5e5e2]">
-          <div className="flex items-center gap-2 px-3">
-            <div className="w-[28px] h-[28px] rounded-full bg-[#e4e4e7] text-[#18181b] flex items-center justify-center text-[10px] font-medium shrink-0">
+        {/* Footer with Logout */}
+        <div className="mt-auto pt-6 border-t border-gray-100">
+          <div className="flex items-center gap-3 px-2 py-2 bg-gray-50 rounded-xl border border-gray-100 group">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
               {userData?.fullName?.charAt(0) || 'A'}
             </div>
             <div className="flex flex-col flex-1 overflow-hidden">
-              <span className="text-[12px] text-[#18181b] truncate">{userData?.fullName || 'Admin User'}</span>
-              <span className="text-[10px] text-[#a1a1aa]">Superadmin</span>
+              <span className="text-xs font-bold text-gray-900 truncate">{userData?.fullName || 'Admin User'}</span>
+              <span className="text-[10px] text-gray-500 font-medium">Superadmin</span>
             </div>
-            <button onClick={handleLogout} className="text-[#a1a1aa] hover:text-[#18181b] transition-colors shrink-0">
-              <LogOut size={14} />
+            <button 
+              onClick={handleLogout} 
+              className="text-gray-400 hover:text-red-500 transition-colors shrink-0 p-1.5 hover:bg-red-50 rounded-lg cursor-pointer"
+              title="Logout"
+            >
+              <LogOut size={16} />
             </button>
           </div>
         </div>
@@ -101,7 +112,7 @@ const AdminDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-y-auto bg-[#fafaf9]">
+      <main className="flex-1 overflow-y-auto bg-gray-50/50 relative">
         <Routes>
           <Route path="/" element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<Overview />} />

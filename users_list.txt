@@ -1,0 +1,26 @@
+Email | Name
+--- | ---
+ramshasyeda45@gmail.com | Syed Ali
+work.rm.13@gmail.com | syed ramsha
+ramsha.owner@gmail.com | Ramsha Ali Khan
+syedaramsha2001@gmail.com | Ramsha The Owner
+owner.greenleafvegeta@servio.com | Owner Green Leaf Vegetaria
+owner.indianasredvelv@servio.com | Owner Indiana's Red Velvet
+owner.shahibhojthalir@servio.com | Owner Shahi Bhoj Thali Res
+owner.greatsagarresta@servio.com | Owner Great Sagar Restaura
+owner.thevganvegresta@servio.com | Owner The V-gan Veg Restau
+owner.indianavegresta@servio.com | Owner Indiana Veg Restaura
+owner.madhubanrestaur@servio.com | Owner Madhuban Restaurant 
+owner.naivedyavegthal@servio.com | Owner Naivedya Veg Thali R
+owner.thefiveelements@servio.com | Owner The Five Elements
+owner.barakakitchen@servio.com | Owner Baraka Kitchen
+owner.greenleaf@servio.com | Owner Green Leaf Vegetaria
+owner.indiana@servio.com | Owner Indiana's Red Velvet
+owner.shahibhoj@servio.com | Owner Shahi Bhoj Thali Res
+owner.greatsagar@servio.com | Owner Great Sagar Restaura
+owner.vgan@servio.com | Owner The V-gan Veg Restau
+owner.indianaveg@servio.com | Owner Indiana Veg Restaura
+owner.madhuban@servio.com | Owner Madhuban Restaurant 
+owner.naivedya@servio.com | Owner Naivedya Veg Thali R
+owner.fiveelements@servio.com | Owner The Five Elements
+owner.baraka@servio.com | Owner Baraka Kitchen

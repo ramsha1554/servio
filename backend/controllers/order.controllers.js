@@ -110,6 +110,8 @@ export const placeOrder = async (req, res) => {
                     })
                 }
             });
+            // Broadcast to all admins
+            io.to('admin_room').emit('adminNewOrder', newOrder)
         }
 
 
@@ -158,6 +160,8 @@ export const verifyPayment = async (req, res) => {
                     })
                 }
             });
+            // Broadcast to all admins
+            io.to('admin_room').emit('adminNewOrder', order)
         }
 
 
@@ -316,6 +320,11 @@ export const updateOrderStatus = async (req, res) => {
                     userId: order.user._id
                 })
             }
+            io.to('admin_room').emit('adminUpdateStatus', {
+                orderId: order._id,
+                shopId: updatedShopOrder.shop._id,
+                status: updatedShopOrder.status
+            })
         }
 
 
@@ -585,6 +594,15 @@ export const verifyDeliveryOtp = async (req, res) => {
             order: order._id,
             assignedTo: shopOrder.assignedDeliveryBoy
         })
+
+        const io = req.app.get('io')
+        if (io) {
+            io.to('admin_room').emit('adminUpdateStatus', {
+                orderId: order._id,
+                shopId: shopOrder.shop._id,
+                status: 'delivered'
+            })
+        }
 
         return res.status(200).json({ message: "Order Delivered Successfully!" })
 

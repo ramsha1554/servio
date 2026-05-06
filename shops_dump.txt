@@ -1,0 +1,14 @@
+Name | City | Items Count
+--- | --- | ---
+Syeda Ramsah Anjum | 'Chhatrapati Sambhaji Nagar' | 1
+My Shop | 'Chhatrapati Sambhaji Nagar' | 0
+Green Leaf Vegetarian Cuisine | 'Chhatrapati Sambhaji Nagar' | 3
+Indiana's Red Velvet Veg Restaurant | 'Chhatrapati Sambhaji Nagar' | 3
+Shahi Bhoj Thali Restaurant | 'Chhatrapati Sambhaji Nagar' | 3
+Great Sagar Restaurant | 'Chhatrapati Sambhaji Nagar' | 3
+The V-gan Veg Restaurant | 'Chhatrapati Sambhaji Nagar' | 2
+Indiana Veg Restaurant and Cake Boutique | 'Chhatrapati Sambhaji Nagar' | 3
+Madhuban Restaurant Aurangabad | 'Chhatrapati Sambhaji Nagar' | 3
+Naivedya Veg Thali Restaurant | 'Chhatrapati Sambhaji Nagar' | 3
+The Five Elements | 'Chhatrapati Sambhaji Nagar' | 2
+Baraka Kitchen | 'Aurangabad' | 3
