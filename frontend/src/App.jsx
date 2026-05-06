@@ -22,7 +22,7 @@ const OrderPlaced = lazy(() => import('./pages/OrderPlaced'))
 const MyOrders = lazy(() => import('./pages/MyOrders'))
 const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage'))
 const Shop = lazy(() => import('./pages/Shop'))
-
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 
 import { API_URL } from './config'
 
@@ -65,6 +65,9 @@ function App() {
         <Route path='/my-orders' element={userData ? <MyOrders /> : <Navigate to={"/signin"} />} />
         <Route path='/track-order/:orderId' element={userData ? <TrackOrderPage /> : <Navigate to={"/signin"} />} />
         <Route path='/shop/:shopId' element={userData ? <Shop /> : <Navigate to={"/signin"} />} />
+        
+        {/* Admin Routes */}
+        <Route path='/admin/*' element={userData?.role === 'admin' ? <AdminDashboard /> : <Navigate to={"/"} />} />
       </Routes>
     </Suspense>
   )
