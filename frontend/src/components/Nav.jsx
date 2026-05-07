@@ -11,7 +11,7 @@ import { FaPlus } from "react-icons/fa6";
 import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 
-function Nav() {
+function Nav({ onCityClick }) {
     const { userData, currentCity, cartItems } = useSelector(state => state.user)
     const { myShopData } = useSelector(state => state.owner)
     const [showInfo, setShowInfo] = useState(false)
@@ -52,9 +52,12 @@ function Nav() {
         <div className='w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] border-b border-gray-100 overflow-visible transition-all duration-300'>
 
             {showSearch && userData.role == "user" && <div className='w-[90%] h-[70px] bg-white shadow-2xl rounded-2xl items-center gap-[20px] flex fixed top-[80px] left-[5%] md:hidden border border-gray-100 z-50 animate-fade-in-up'>
-                <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-100'>
+                <div 
+                    className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors rounded-l-2xl'
+                    onClick={onCityClick}
+                >
                     <FaLocationDot size={22} className="text-[#ff4d2d]" />
-                    <div className='w-[80%] truncate text-gray-600 font-medium'>{currentCity}</div>
+                    <div className='w-[80%] truncate text-gray-600 font-medium'>{currentCity || "Select City"}</div>
                 </div>
                 <div className='w-[80%] flex items-center gap-[10px] pr-4'>
                     <IoIosSearch size={25} className='text-[#ff4d2d]' />
@@ -76,9 +79,12 @@ function Nav() {
             </h1>
 
             {userData.role == "user" && <div className='md:w-[60%] lg:w-[40%] h-[55px] bg-white border border-gray-200 shadow-sm rounded-full items-center gap-[20px] hidden md:flex transition-all duration-300 hover:shadow-md focus-within:ring-2 focus-within:ring-[#ff4d2d]/20 focus-within:border-[#ff4d2d]'>
-                <div className='flex items-center w-[30%] overflow-hidden gap-[10px] pl-[20px] pr-[10px] border-r-[2px] border-gray-100 h-[60%]'>
+                <div 
+                    className='flex items-center w-[30%] overflow-hidden gap-[10px] pl-[20px] pr-[10px] border-r-[2px] border-gray-100 h-[60%] cursor-pointer hover:bg-gray-50 transition-colors rounded-l-full'
+                    onClick={onCityClick}
+                >
                     <FaLocationDot size={20} className="text-[#ff4d2d]" />
-                    <div className='w-[80%] truncate text-gray-600 font-medium text-sm'>{currentCity}</div>
+                    <div className='w-[80%] truncate text-gray-600 font-medium text-sm'>{currentCity || "Select City"}</div>
                 </div>
                 <div className='w-[70%] flex items-center gap-[10px] pr-[20px]'>
                     <IoIosSearch size={24} className='text-gray-400' />
