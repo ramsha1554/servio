@@ -4,7 +4,8 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     userData: null,
-    currentCity: null,
+    currentCity: localStorage.getItem("servio_city") || null,
+    cityManuallySelected: localStorage.getItem("servio_city_manual") === "true",
     currentState: null,
     currentAddress: null,
     shopInMyCity: null,
@@ -103,9 +104,12 @@ const userSlice = createSlice({
     },
     setIsCheckingAuth: (state, action) => {
       state.isCheckingAuth = action.payload
+    },
+    setCityManuallySelected: (state, action) => {
+      state.cityManuallySelected = action.payload
     }
   }
 })
 
-export const { setUserData, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount, updateRealtimeOrderStatus, setIsCheckingAuth } = userSlice.actions
+export const { setUserData, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount, updateRealtimeOrderStatus, setIsCheckingAuth, setCityManuallySelected } = userSlice.actions
 export default userSlice.reducer
