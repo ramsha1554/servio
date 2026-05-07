@@ -121,7 +121,7 @@ function CheckOut() {
 
   const handlePlaceOrder = async () => {
     try {
-      const result = await axios.post(`${serverUrl}/api/order/place-order`, {
+      const orderPayload = {
         paymentMethod,
         deliveryAddress: {
           text: addressInput,
@@ -129,8 +129,13 @@ function CheckOut() {
           longitude: location.lon
         },
         totalAmount: finalTotal,
-        cartItems
-      }, { withCredentials: true })
+        cartItems: cartItems.map(item => ({
+          ...item,
+          shop: typeof item.shop === 'object' ? item.shop._id : item.shop
+        }))
+      }
+
+      const result = await axios.post(`${serverUrl}/api/order/place-order`, orderPayload, { withCredentials: true })
 
       if (paymentMethod == "cod") {
         dispatch(addMyOrder(result.data))
