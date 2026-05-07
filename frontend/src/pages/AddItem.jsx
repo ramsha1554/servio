@@ -54,7 +54,8 @@ function AddItem() {
            setLoading(false)
            navigate("/")
         } catch (error) {
-            console.log(error)
+            console.error("Item creation error:", error)
+            alert(error.response?.data?.message || "Internal Server Error: Failed to add item. Check console for details.")
             setLoading(false)
         }
     }

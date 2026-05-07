@@ -73,8 +73,7 @@ const orderSchema = new mongoose.Schema({
             default: 'Point'
         },
         coordinates: {
-            type: [Number],
-            index: '2dsphere'
+            type: [Number]
         }
     },
     totalAmount: {
@@ -95,6 +94,8 @@ const orderSchema = new mongoose.Schema({
         default: ""
     }
 }, { timestamps: true })
+
+orderSchema.index({ location: "2dsphere" })
 
 const Order = mongoose.model("Order", orderSchema)
 export default Order

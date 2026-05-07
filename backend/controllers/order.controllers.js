@@ -347,12 +347,15 @@ export const updateOrderStatus = async (req, res) => {
 
 export const getDeliveryBoyAssignment = async (req, res) => {
     try {
+        console.log("=== getAssignments Start ===");
+        console.log("req.query:", req.query);
         const deliveryBoyId = req.userId
         let { latitude, longitude } = req.query
 
         // Default to DB location if not provided in query
         if (!latitude || !longitude) {
             const deliveryBoy = await User.findById(deliveryBoyId)
+            console.log("deliveryBoy fetched:", deliveryBoy ? deliveryBoy.email : "not found", deliveryBoy?.location);
             if (deliveryBoy && deliveryBoy.location && deliveryBoy.location.coordinates[0] !== 0) {
                 longitude = deliveryBoy.location.coordinates[0]
                 latitude = deliveryBoy.location.coordinates[1]
@@ -374,15 +377,14 @@ export const getDeliveryBoyAssignment = async (req, res) => {
                 items: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId)).shopOrderItems || [],
                 subtotal: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId))?.subtotal
             }))
-            return res.status(200).json(formated)
+            return res.status(200).json({ success: true, assignments: formated })
         }
 
         const lon1 = Number(longitude)
         const lat1 = Number(latitude)
 
-        // 1. Find Orders near the delivery boy (5km radius)
-        // Using MongoDB geospatial query which is much faster than JS filtering
-        const nearbyOrders = await Order.find({
+        console.log("Querying orders with lon1:", lon1, "lat1:", lat1);
+        const geoQuery = {
             location: {
                 $near: {
                     $geometry: {
@@ -392,12 +394,17 @@ export const getDeliveryBoyAssignment = async (req, res) => {
                     $maxDistance: 5000 // 5km
                 }
             }
-        }).select("_id");
+        };
+        console.log("MongoDB Query:", JSON.stringify(geoQuery, null, 2));
+
+        // 1. Find Orders near the delivery boy (5km radius)
+        // Using MongoDB geospatial query which is much faster than JS filtering
+        const nearbyOrders = await Order.find(geoQuery).select("_id");
 
         const nearbyOrderIds = nearbyOrders.map(o => o._id);
 
         if (nearbyOrderIds.length === 0) {
-            return res.status(200).json([])
+            return res.status(200).json({ success: true, assignments: [] })
         }
 
         // 2. Find Broadcasted Assignments corresponding to these nearby orders
@@ -418,9 +425,11 @@ export const getDeliveryBoyAssignment = async (req, res) => {
             subtotal: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId))?.subtotal
         }))
 
-        return res.status(200).json(formated)
+        return res.status(200).json({ success: true, assignments: formated })
     } catch (error) {
-        return res.status(500).json({ message: `get Assignment error ${error}` })
+        console.error("=== getAssignments Error ===");
+        console.error(error);
+        return res.status(500).json({ success: false, message: `get Assignment error: ${error.message}` })
     }
 }
 
@@ -518,9 +527,12 @@ export const getCurrentOrder = async (req, res) => {
             customerLocation
         })
 
-
     } catch (error) {
-
+        console.error("getCurrentOrder error:", error)
+        return res.status(500).json({ 
+            success: false, 
+            message: "getCurrentOrder error " + error.message 
+        })
     }
 }
 

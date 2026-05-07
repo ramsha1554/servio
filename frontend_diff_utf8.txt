@@ -1,0 +1,337 @@
+﻿diff --git a/frontend/src/components/DeliveryBoy.jsx b/frontend/src/components/DeliveryBoy.jsx
+index 84024cf..9611f30 100644
+--- a/frontend/src/components/DeliveryBoy.jsx
++++ b/frontend/src/components/DeliveryBoy.jsx
+@@ -24,6 +24,7 @@ function DeliveryBoy() {
+   const [loading, setLoading] = useState(false)
+   const [message, setMessage] = useState("")
+   const [fetchedWithLocation, setFetchedWithLocation] = useState(false)
++  const [errorMsg, setErrorMsg] = useState("")
+ 
+   const getAddress = async (lat, lon) => {
+     try {
+@@ -115,6 +116,7 @@ function DeliveryBoy() {
+ 
+   const getAssignments = async (lat, lng) => {
+     try {
++      setErrorMsg("");
+       const params = {}
+       if (lat && lng) {
+         params.latitude = lat
+@@ -122,9 +124,14 @@ function DeliveryBoy() {
+       }
+       const result = await axios.get(`${serverUrl}/api/order/get-assignments`, { withCredentials: true, params })
+ 
+-      setAvailableAssignments(result.data)
++      if (result.data.success) {
++        setAvailableAssignments(result.data.assignments)
++      } else {
++        setErrorMsg(result.data.message || "Could not load assignments. Please try again.")
++      }
+     } catch (error) {
+-      console.log(error)
++      console.error("getAssignments error:", error.response?.data || error)
++      setErrorMsg("Could not load assignments. Please try again.")
+     }
+   }
+ 
+@@ -199,11 +206,6 @@ function DeliveryBoy() {
+ 
+ 
+   useEffect(() => {
+-    if (deliveryBoyLocation) {
+-      getAssignments(deliveryBoyLocation.lat, deliveryBoyLocation.lon)
+-    } else {
+-      getAssignments()
+-    }
+     getCurrentOrder()
+     handleTodayDeliveries()
+   }, [userData])
+@@ -246,23 +248,29 @@ function DeliveryBoy() {
+         {!currentOrder && <div className='bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100'>
+           <h1 className='text-lg font-bold mb-4 flex items-center gap-2'>Available Orders</h1>
+ 
+-          <div className='space-y-4'>
+-            {availableAssignments?.length > 0
+-              ?
+-              (
+-                availableAssignments.map((a, index) => (
+-                  <div className='border rounded-lg p-4 flex justify-between items-center' key={index}>
+-                    <div>
+-                      <p className='text-sm font-semibold'>{a?.shopName}</p>
+-                      <p className='text-sm text-gray-500'><span className='font-semibold'>Delivery Address:</span> {a?.deliveryAddress.text}</p>
+-                      <p className='text-xs text-gray-400'>{a.items.length} items | {a.subtotal}</p>
+-                    </div>
+-                    <button className='bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600' onClick={() => acceptOrder(a.assignmentId)}>Accept</button>
++          {errorMsg ? (
++            <p className='text-red-500 text-sm font-semibold'>{errorMsg}</p>
++          ) : !deliveryBoyLocation ? (
++            <p className='text-gray-500 text-sm'>Waiting for your location...</p>
++          ) : (
++            <div className='space-y-4'>
++              {availableAssignments?.length > 0
++                ?
++                (
++                  availableAssignments.map((a, index) => (
++                    <div className='border rounded-lg p-4 flex justify-between items-center' key={index}>
++                      <div>
++                        <p className='text-sm font-semibold'>{a?.shopName}</p>
++                        <p className='text-sm text-gray-500'><span className='font-semibold'>Delivery Address:</span> {a?.deliveryAddress.text}</p>
++                        <p className='text-xs text-gray-400'>{a.items.length} items | {a.subtotal}</p>
++                      </div>
++                      <button className='bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600' onClick={() => acceptOrder(a.assignmentId)}>Accept</button>
+ 
+-                  </div>
+-                ))
+-              ) : <p className='text-gray-400 text-sm'>No Available Orders</p>}
+-          </div>
++                    </div>
++                  ))
++                ) : <p className='text-gray-400 text-sm'>No Available Orders</p>}
++            </div>
++          )}
+         </div>}
+ 
+         {currentOrder && <div className='bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100'>
+@@ -275,8 +283,8 @@ function DeliveryBoy() {
+ 
+           <DeliveryBoyTracking data={{
+             deliveryBoyLocation: deliveryBoyLocation || {
+-              lat: userData.location.coordinates[1],
+-              lon: userData.location.coordinates[0]
++              lat: userData.location?.coordinates?.[1] || 0,
++              lon: userData.location?.coordinates?.[0] || 0
+             },
+             customerLocation: {
+               lat: currentOrder.deliveryAddress.latitude,
+diff --git a/frontend/src/components/ShopCard.jsx b/frontend/src/components/ShopCard.jsx
+index 946e633..bcd5a90 100644
+--- a/frontend/src/components/ShopCard.jsx
++++ b/frontend/src/components/ShopCard.jsx
+@@ -2,6 +2,10 @@
+ import React from 'react'
+ 
+ function ShopCard({ shop, onClick }) {
++    const displayCategories = shop.categories?.length > 0 
++        ? shop.categories 
++        : Array.from(new Set(shop.items?.map(i => i.category).filter(Boolean)));
++        
+     return (
+         <div
+             className='min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100 group'
+@@ -16,7 +20,7 @@ function ShopCard({ shop, onClick }) {
+                 <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60'></div>
+                 <div className='absolute bottom-3 left-3 text-white'>
+                     <p className='text-xs font-medium bg-[#ff4d2d] px-2 py-0.5 rounded-md inline-block mb-1'>
+-                        {shop.categories?.[0] || 'Restaurant'}
++                        {displayCategories?.[0] || 'Restaurant'}
+                     </p>
+                 </div>
+             </div>
+@@ -32,7 +36,7 @@ function ShopCard({ shop, onClick }) {
+                 </div>
+ 
+                 <p className='text-sm text-gray-500 truncate'>
+-                    {shop.categories?.join(', ')}
++                    {displayCategories?.join(', ')}
+                 </p>
+ 
+                 <div className='flex items-center gap-2 mt-2 text-xs text-gray-400 font-medium'>
+diff --git a/frontend/src/components/UserDashboard.jsx b/frontend/src/components/UserDashboard.jsx
+index cf6c3ad..935882f 100644
+--- a/frontend/src/components/UserDashboard.jsx
++++ b/frontend/src/components/UserDashboard.jsx
+@@ -38,19 +38,20 @@ function UserDashboard() {
+         // 1. Filter Items
+         let filteredItems = itemsInMyCity?.filter(i => {
+           if (category === "Burgers") {
+-            return i.category === "Fast Food" && i.name.toLowerCase().includes("burger");
++            return i.category?.toLowerCase() === "fast food" && i.name?.toLowerCase().includes("burger");
+           }
+-          return i.category === category;
++          return i.category?.toLowerCase() === category.toLowerCase();
+         })
+         setUpdatedItemsList(filteredItems)
+ 
+         // 2. Filter Shops
+         let filteredShops = shopInMyCity?.filter(shop => {
+           if (category === "Burgers") {
+-            // Show shops that have "Fast Food" category if user clicks "Burgers"
+-            return shop.categories?.includes("Fast Food");
++            return shop.categories?.some(c => c.toLowerCase() === "fast food") || 
++                   shop.items?.some(i => i.category?.toLowerCase() === "fast food" && i.name?.toLowerCase().includes("burger"));
+           }
+-          return shop.categories?.includes(category);
++          return shop.categories?.some(c => c.toLowerCase() === category.toLowerCase()) || 
++                 shop.items?.some(i => i.category?.toLowerCase() === category.toLowerCase());
+         })
+         setUpdatedShopList(filteredShops)
+       }
+diff --git a/frontend/src/hooks/useGetCity.jsx b/frontend/src/hooks/useGetCity.jsx
+index d54ff1e..e8c9e8d 100644
+--- a/frontend/src/hooks/useGetCity.jsx
++++ b/frontend/src/hooks/useGetCity.jsx
+@@ -7,23 +7,21 @@ import { setAddress, setLocation } from '../redux/mapSlice'
+ 
+ function useGetCity() {
+     const dispatch=useDispatch()
+-    const {userData}=useSelector(state=>state.user)
++    const { currentCity }=useSelector(state=>state.user)
+     const apiKey=import.meta.env.VITE_GEOAPIKEY
+     useEffect(()=>{
+-navigator.geolocation.getCurrentPosition(async (position)=>{
+-    console.log(position)
+-    const latitude=position.coords.latitude
+-    const longitude=position.coords.longitude
+-    dispatch(setLocation({lat:latitude,lon:longitude}))
+-    const result=await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apiKey}`)
+-  console.log(result.data)
+-    dispatch(setCurrentCity(result?.data?.results[0].city||result?.data?.results[0].county
+-))
+-    dispatch(setCurrentState(result?.data?.results[0].state))
+-     dispatch(setCurrentAddress(result?.data?.results[0].address_line2 || result?.data?.results[0].address_line1 ))
+-  dispatch(setAddress(result?.data?.results[0].address_line2))
+-})
+-    },[userData])
++        if (currentCity) return;
++        navigator.geolocation.getCurrentPosition(async (position)=>{
++            const latitude=position.coords.latitude
++            const longitude=position.coords.longitude
++            dispatch(setLocation({lat:latitude,lon:longitude}))
++            const result=await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apiKey}`)
++            dispatch(setCurrentCity(result?.data?.results[0].city||result?.data?.results[0].county))
++            dispatch(setCurrentState(result?.data?.results[0].state))
++            dispatch(setCurrentAddress(result?.data?.results[0].address_line2 || result?.data?.results[0].address_line1 ))
++            dispatch(setAddress(result?.data?.results[0].address_line2))
++        })
++    },[])
+ }
+ 
+ export default useGetCity
+diff --git a/frontend/src/pages/AddItem.jsx b/frontend/src/pages/AddItem.jsx
+index 21fb5c4..43389d8 100644
+--- a/frontend/src/pages/AddItem.jsx
++++ b/frontend/src/pages/AddItem.jsx
+@@ -54,7 +54,8 @@ function AddItem() {
+            setLoading(false)
+            navigate("/")
+         } catch (error) {
+-            console.log(error)
++            console.error("Item creation error:", error)
++            alert(error.response?.data?.message || "Internal Server Error: Failed to add item. Check console for details.")
+             setLoading(false)
+         }
+     }
+diff --git a/frontend/src/pages/CheckOut.jsx b/frontend/src/pages/CheckOut.jsx
+index 86733fb..4d4f631 100644
+--- a/frontend/src/pages/CheckOut.jsx
++++ b/frontend/src/pages/CheckOut.jsx
+@@ -91,10 +91,13 @@ function CheckOut() {
+     getAddressByLatLng(lat, lng)
+   }
+   const getCurrentLocation = () => {
+-    const latitude = userData.location.coordinates[1]
+-    const longitude = userData.location.coordinates[0]
+-    dispatch(setLocation({ lat: latitude, lon: longitude }))
+-    getAddressByLatLng(latitude, longitude)
++    const latitude = userData.location?.coordinates?.[1]
++    const longitude = userData.location?.coordinates?.[0]
++    
++    if (latitude && longitude) {
++      dispatch(setLocation({ lat: latitude, lon: longitude }))
++      getAddressByLatLng(latitude, longitude)
++    }
+   }
+ 
+   const getAddressByLatLng = async (lat, lng) => {
+diff --git a/frontend/src/pages/CreateEditShop.jsx b/frontend/src/pages/CreateEditShop.jsx
+index 0b8ffdc..26b332d 100644
+--- a/frontend/src/pages/CreateEditShop.jsx
++++ b/frontend/src/pages/CreateEditShop.jsx
+@@ -12,39 +12,49 @@ import { ClipLoader } from 'react-spinners';
+ function CreateEditShop() {
+     const navigate = useNavigate()
+     const { myShopData } = useSelector(state => state.owner)
+-    const { currentCity,currentState,currentAddress } = useSelector(state => state.user)
+-    const [name,setName]=useState(myShopData?.name || "")
+-     const [address,setAddress]=useState(myShopData?.address || currentAddress)
+-     const [city,setCity]=useState(myShopData?.city || currentCity)
+-       const [state,setState]=useState(myShopData?.state || currentState)
+-       const [frontendImage,setFrontendImage]=useState(myShopData?.image || null)
+-       const [backendImage,setBackendImage]=useState(null)
+-       const [loading,setLoading]=useState(false)
+-       const dispatch=useDispatch()
+-       const handleImage=(e)=>{
+-        const file=e.target.files[0]
++    const { userData, currentCity, currentState, currentAddress } = useSelector(state => state.user)
++    
++    // Fix: Uncontrolled input warnings by ensuring fallback to empty strings
++    const [name, setName] = useState(myShopData?.name || "")
++    const [address, setAddress] = useState(myShopData?.address || currentAddress || "")
++    const [city, setCity] = useState(myShopData?.city || currentCity || "")
++    const [state, setState] = useState(myShopData?.state || currentState || "")
++    const [frontendImage, setFrontendImage] = useState(myShopData?.image || null)
++    const [backendImage, setBackendImage] = useState(null)
++    const [loading, setLoading] = useState(false)
++    const dispatch = useDispatch()
++    
++    const handleImage = (e) => {
++        const file = e.target.files[0]
+         setBackendImage(file)
+         setFrontendImage(URL.createObjectURL(file))
+-       }
++    }
+ 
+-       const handleSubmit=async (e)=>{
++    const handleSubmit = async (e) => {
+         e.preventDefault()
+         setLoading(true)
+         try {
+-           const formData=new FormData()
+-           formData.append("name",name) 
+-           formData.append("city",city) 
+-           formData.append("state",state) 
+-           formData.append("address",address) 
+-           if(backendImage){
+-            formData.append("image",backendImage)
+-           }
++            const formData = new FormData()
++            formData.append("name", name)
++            formData.append("city", city)
++            formData.append("state", state)
++            formData.append("address", address)
++            
++            // Explicitly appending ownerId as requested
++            if (userData?._id) {
++                formData.append("ownerId", userData._id)
++            }
++            
++            if (backendImage) {
++                formData.append("image", backendImage)
++            }
+            const result=await axios.post(`${serverUrl}/api/shop/create-edit`,formData,{withCredentials:true})
+            dispatch(setMyShopData(result.data))
+           setLoading(false)
+           navigate("/")
+         } catch (error) {
+-            console.log(error)
++            console.error("Shop creation error:", error)
++            alert(error.response?.data?.message || "Internal Server Error: Failed to save shop. Check console for details.")
+             setLoading(false)
+         }
+        }
+diff --git a/frontend/src/pages/TrackOrderPage.jsx b/frontend/src/pages/TrackOrderPage.jsx
+index b72888e..3dd422d 100644
+--- a/frontend/src/pages/TrackOrderPage.jsx
++++ b/frontend/src/pages/TrackOrderPage.jsx
+@@ -60,8 +60,8 @@ setLiveLocations(prev=>({
+   <div className="h-[400px] w-full rounded-2xl overflow-hidden shadow-md">
+     <DeliveryBoyTracking data={{
+       deliveryBoyLocation:liveLocations[shopOrder.assignedDeliveryBoy._id] || {
+-        lat: shopOrder.assignedDeliveryBoy.location.coordinates[1],
+-        lon: shopOrder.assignedDeliveryBoy.location.coordinates[0]
++        lat: shopOrder.assignedDeliveryBoy?.location?.coordinates?.[1] || 0,
++        lon: shopOrder.assignedDeliveryBoy?.location?.coordinates?.[0] || 0
+       },
+       customerLocation: {
+         lat: currentOrder.deliveryAddress.latitude,

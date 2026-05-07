@@ -91,10 +91,13 @@ function CheckOut() {
     getAddressByLatLng(lat, lng)
   }
   const getCurrentLocation = () => {
-    const latitude = userData.location.coordinates[1]
-    const longitude = userData.location.coordinates[0]
-    dispatch(setLocation({ lat: latitude, lon: longitude }))
-    getAddressByLatLng(latitude, longitude)
+    const latitude = userData.location?.coordinates?.[1]
+    const longitude = userData.location?.coordinates?.[0]
+    
+    if (latitude && longitude) {
+      dispatch(setLocation({ lat: latitude, lon: longitude }))
+      getAddressByLatLng(latitude, longitude)
+    }
   }
 
   const getAddressByLatLng = async (lat, lng) => {

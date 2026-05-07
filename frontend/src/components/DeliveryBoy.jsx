@@ -24,6 +24,7 @@ function DeliveryBoy() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [fetchedWithLocation, setFetchedWithLocation] = useState(false)
+  const [errorMsg, setErrorMsg] = useState("")
 
   const getAddress = async (lat, lon) => {
     try {
@@ -115,6 +116,7 @@ function DeliveryBoy() {
 
   const getAssignments = async (lat, lng) => {
     try {
+      setErrorMsg("");
       const params = {}
       if (lat && lng) {
         params.latitude = lat
@@ -122,9 +124,14 @@ function DeliveryBoy() {
       }
       const result = await axios.get(`${serverUrl}/api/order/get-assignments`, { withCredentials: true, params })
 
-      setAvailableAssignments(result.data)
+      if (result.data.success) {
+        setAvailableAssignments(result.data.assignments)
+      } else {
+        setErrorMsg(result.data.message || "Could not load assignments. Please try again.")
+      }
     } catch (error) {
-      console.log(error)
+      console.error("getAssignments error:", error.response?.data || error)
+      setErrorMsg("Could not load assignments. Please try again.")
     }
   }
 
@@ -199,11 +206,6 @@ function DeliveryBoy() {
 
 
   useEffect(() => {
-    if (deliveryBoyLocation) {
-      getAssignments(deliveryBoyLocation.lat, deliveryBoyLocation.lon)
-    } else {
-      getAssignments()
-    }
     getCurrentOrder()
     handleTodayDeliveries()
   }, [userData])
@@ -246,23 +248,29 @@ function DeliveryBoy() {
         {!currentOrder && <div className='bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100'>
           <h1 className='text-lg font-bold mb-4 flex items-center gap-2'>Available Orders</h1>
 
-          <div className='space-y-4'>
-            {availableAssignments?.length > 0
-              ?
-              (
-                availableAssignments.map((a, index) => (
-                  <div className='border rounded-lg p-4 flex justify-between items-center' key={index}>
-                    <div>
-                      <p className='text-sm font-semibold'>{a?.shopName}</p>
-                      <p className='text-sm text-gray-500'><span className='font-semibold'>Delivery Address:</span> {a?.deliveryAddress.text}</p>
-                      <p className='text-xs text-gray-400'>{a.items.length} items | {a.subtotal}</p>
-                    </div>
-                    <button className='bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600' onClick={() => acceptOrder(a.assignmentId)}>Accept</button>
+          {errorMsg ? (
+            <p className='text-red-500 text-sm font-semibold'>{errorMsg}</p>
+          ) : !deliveryBoyLocation ? (
+            <p className='text-gray-500 text-sm'>Waiting for your location...</p>
+          ) : (
+            <div className='space-y-4'>
+              {availableAssignments?.length > 0
+                ?
+                (
+                  availableAssignments.map((a, index) => (
+                    <div className='border rounded-lg p-4 flex justify-between items-center' key={index}>
+                      <div>
+                        <p className='text-sm font-semibold'>{a?.shopName}</p>
+                        <p className='text-sm text-gray-500'><span className='font-semibold'>Delivery Address:</span> {a?.deliveryAddress.text}</p>
+                        <p className='text-xs text-gray-400'>{a.items.length} items | {a.subtotal}</p>
+                      </div>
+                      <button className='bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600' onClick={() => acceptOrder(a.assignmentId)}>Accept</button>
 
-                  </div>
-                ))
-              ) : <p className='text-gray-400 text-sm'>No Available Orders</p>}
-          </div>
+                    </div>
+                  ))
+                ) : <p className='text-gray-400 text-sm'>No Available Orders</p>}
+            </div>
+          )}
         </div>}
 
         {currentOrder && <div className='bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100'>
@@ -275,8 +283,8 @@ function DeliveryBoy() {
 
           <DeliveryBoyTracking data={{
             deliveryBoyLocation: deliveryBoyLocation || {
-              lat: userData.location.coordinates[1],
-              lon: userData.location.coordinates[0]
+              lat: userData.location?.coordinates?.[1] || 0,
+              lon: userData.location?.coordinates?.[0] || 0
             },
             customerLocation: {
               lat: currentOrder.deliveryAddress.latitude,

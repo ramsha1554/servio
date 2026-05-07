@@ -38,19 +38,20 @@ function UserDashboard() {
         // 1. Filter Items
         let filteredItems = itemsInMyCity?.filter(i => {
           if (category === "Burgers") {
-            return i.category === "Fast Food" && i.name.toLowerCase().includes("burger");
+            return i.category?.toLowerCase() === "fast food" && i.name?.toLowerCase().includes("burger");
           }
-          return i.category === category;
+          return i.category?.toLowerCase() === category.toLowerCase();
         })
         setUpdatedItemsList(filteredItems)
 
         // 2. Filter Shops
         let filteredShops = shopInMyCity?.filter(shop => {
           if (category === "Burgers") {
-            // Show shops that have "Fast Food" category if user clicks "Burgers"
-            return shop.categories?.includes("Fast Food");
+            return shop.categories?.some(c => c.toLowerCase() === "fast food") || 
+                   shop.items?.some(i => i.category?.toLowerCase() === "fast food" && i.name?.toLowerCase().includes("burger"));
           }
-          return shop.categories?.includes(category);
+          return shop.categories?.some(c => c.toLowerCase() === category.toLowerCase()) || 
+                 shop.items?.some(i => i.category?.toLowerCase() === category.toLowerCase());
         })
         setUpdatedShopList(filteredShops)
       }

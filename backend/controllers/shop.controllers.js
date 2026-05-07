@@ -4,79 +4,100 @@ import redis from "../config/redis.js";
 
 export const createEditShop = async (req, res) => {
     try {
-        const { name, city, state, address } = req.body
+        const { name, city, state, address, ownerId } = req.body;
+        // Use provided ownerId or fallback to req.userId
+        const finalOwnerId = ownerId || req.userId;
+        
         let image;
         if (req.file) {
-            console.log(req.file)
+            console.log("Uploading file to Cloudinary:", req.file.path);
             image = await uploadOnCloudinary(req.file.path)
+            if (!image) {
+                return res.status(500).json({ message: "Image upload failed. Please check Cloudinary configuration." })
+            }
         }
-        let shop = await Shop.findOne({ owner: req.userId })
+
+        let shop = await Shop.findOne({ owner: finalOwnerId })
         const oldCity = shop?.city;
 
         if (!shop) {
+            if (!image) {
+                return res.status(400).json({ message: "A shop image is strictly required when creating a new shop." })
+            }
             shop = await Shop.create({
-                name, city, state, address, image, owner: req.userId, categories: req.body.categories, location: req.body.location
+                name, city, state, address, image, owner: finalOwnerId, categories: req.body.categories, location: req.body.location
             })
         } else {
-            shop = await Shop.findByIdAndUpdate(shop._id, {
-                name, city, state, address, image, owner: req.userId, categories: req.body.categories, location: req.body.location
-            }, { new: true })
+            const updateData = { name, city, state, address, owner: finalOwnerId, categories: req.body.categories, location: req.body.location }
+            if (image) {
+                updateData.image = image;
+            }
+            shop = await Shop.findByIdAndUpdate(shop._id, updateData, { new: true })
         }
 
         await shop.populate("owner items")
 
-        // Invalidate Cache
-        if (city) {
-            await redis.del(`shops:${city}`);
-        }
-        if (oldCity && oldCity !== city) {
-            await redis.del(`shops:${oldCity}`);
+        // Invalidate Cache Safely
+        try {
+            if (city) await redis.del(`shops:${city}`);
+            if (oldCity && oldCity !== city) await redis.del(`shops:${oldCity}`);
+        } catch (redisError) {
+            console.error("Redis cache invalidation error:", redisError);
         }
 
         return res.status(201).json(shop)
     } catch (error) {
-        return res.status(500).json({ message: `create shop error ${error}` })
+        console.error("createEditShop Error:", error);
+        return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }
 
 export const getMyShop = async (req, res) => {
     try {
-        console.log("Fetching shop for Owner ID:", req.userId);
         const shop = await Shop.findOne({ owner: req.userId }).populate("owner").populate({
             path: "items",
             options: { sort: { updatedAt: -1 } }
         })
         if (!shop) {
-            console.log("Shop NOT found for this owner.");
-            return null
+            return res.status(200).json(null)
         }
-        console.log("Shop Found:", shop.name);
         return res.status(200).json(shop)
     } catch (error) {
-        return res.status(500).json({ message: `get my shop error ${error}` })
+        console.error("getMyShop Error:", error);
+        return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }
 
 export const getShopByCity = async (req, res) => {
     try {
         const { city } = req.params
-
-        const cachedShops = await redis.get(`shops:${city}`);
-        if (cachedShops) {
-            return res.status(200).json(JSON.parse(cachedShops));
+        
+        try {
+            const cachedShops = await redis.get(`shops:${city}`);
+            if (cachedShops) {
+                return res.status(200).json(JSON.parse(cachedShops));
+            }
+        } catch (redisError) {
+            console.error("Redis get error:", redisError);
         }
 
         const shops = await Shop.find({
             city: { $regex: new RegExp(`^${city}$`, "i") }
         }).populate('items')
-        if (!shops) {
-            return res.status(400).json({ message: "shops not found" })
+        
+        if (!shops || shops.length === 0) {
+            return res.status(200).json([]) // Return empty array instead of 400
         }
 
-        await redis.set(`shops:${city}`, JSON.stringify(shops), "EX", 300);
+        try {
+            await redis.set(`shops:${city}`, JSON.stringify(shops), "EX", 300);
+        } catch (redisError) {
+            console.error("Redis set error:", redisError);
+        }
 
         return res.status(200).json(shops)
     } catch (error) {
-        return res.status(500).json({ message: `get shop by city error ${error}` })
+        console.error("getShopByCity Error:", error);
+        return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }

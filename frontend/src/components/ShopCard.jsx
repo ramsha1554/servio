@@ -2,6 +2,10 @@
 import React from 'react'
 
 function ShopCard({ shop, onClick }) {
+    const displayCategories = shop.categories?.length > 0 
+        ? shop.categories 
+        : Array.from(new Set(shop.items?.map(i => i.category).filter(Boolean)));
+        
     return (
         <div
             className='min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100 group'
@@ -16,7 +20,7 @@ function ShopCard({ shop, onClick }) {
                 <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60'></div>
                 <div className='absolute bottom-3 left-3 text-white'>
                     <p className='text-xs font-medium bg-[#ff4d2d] px-2 py-0.5 rounded-md inline-block mb-1'>
-                        {shop.categories?.[0] || 'Restaurant'}
+                        {displayCategories?.[0] || 'Restaurant'}
                     </p>
                 </div>
             </div>
@@ -32,7 +36,7 @@ function ShopCard({ shop, onClick }) {
                 </div>
 
                 <p className='text-sm text-gray-500 truncate'>
-                    {shop.categories?.join(', ')}
+                    {displayCategories?.join(', ')}
                 </p>
 
                 <div className='flex items-center gap-2 mt-2 text-xs text-gray-400 font-medium'>

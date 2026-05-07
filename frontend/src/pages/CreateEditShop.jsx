@@ -12,39 +12,49 @@ import { ClipLoader } from 'react-spinners';
 function CreateEditShop() {
     const navigate = useNavigate()
     const { myShopData } = useSelector(state => state.owner)
-    const { currentCity,currentState,currentAddress } = useSelector(state => state.user)
-    const [name,setName]=useState(myShopData?.name || "")
-     const [address,setAddress]=useState(myShopData?.address || currentAddress)
-     const [city,setCity]=useState(myShopData?.city || currentCity)
-       const [state,setState]=useState(myShopData?.state || currentState)
-       const [frontendImage,setFrontendImage]=useState(myShopData?.image || null)
-       const [backendImage,setBackendImage]=useState(null)
-       const [loading,setLoading]=useState(false)
-       const dispatch=useDispatch()
-       const handleImage=(e)=>{
-        const file=e.target.files[0]
+    const { userData, currentCity, currentState, currentAddress } = useSelector(state => state.user)
+    
+    // Fix: Uncontrolled input warnings by ensuring fallback to empty strings
+    const [name, setName] = useState(myShopData?.name || "")
+    const [address, setAddress] = useState(myShopData?.address || currentAddress || "")
+    const [city, setCity] = useState(myShopData?.city || currentCity || "")
+    const [state, setState] = useState(myShopData?.state || currentState || "")
+    const [frontendImage, setFrontendImage] = useState(myShopData?.image || null)
+    const [backendImage, setBackendImage] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const dispatch = useDispatch()
+    
+    const handleImage = (e) => {
+        const file = e.target.files[0]
         setBackendImage(file)
         setFrontendImage(URL.createObjectURL(file))
-       }
+    }
 
-       const handleSubmit=async (e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
         try {
-           const formData=new FormData()
-           formData.append("name",name) 
-           formData.append("city",city) 
-           formData.append("state",state) 
-           formData.append("address",address) 
-           if(backendImage){
-            formData.append("image",backendImage)
-           }
+            const formData = new FormData()
+            formData.append("name", name)
+            formData.append("city", city)
+            formData.append("state", state)
+            formData.append("address", address)
+            
+            // Explicitly appending ownerId as requested
+            if (userData?._id) {
+                formData.append("ownerId", userData._id)
+            }
+            
+            if (backendImage) {
+                formData.append("image", backendImage)
+            }
            const result=await axios.post(`${serverUrl}/api/shop/create-edit`,formData,{withCredentials:true})
            dispatch(setMyShopData(result.data))
           setLoading(false)
           navigate("/")
         } catch (error) {
-            console.log(error)
+            console.error("Shop creation error:", error)
+            alert(error.response?.data?.message || "Internal Server Error: Failed to save shop. Check console for details.")
             setLoading(false)
         }
        }

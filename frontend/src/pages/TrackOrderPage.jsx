@@ -60,8 +60,8 @@ setLiveLocations(prev=>({
   <div className="h-[400px] w-full rounded-2xl overflow-hidden shadow-md">
     <DeliveryBoyTracking data={{
       deliveryBoyLocation:liveLocations[shopOrder.assignedDeliveryBoy._id] || {
-        lat: shopOrder.assignedDeliveryBoy.location.coordinates[1],
-        lon: shopOrder.assignedDeliveryBoy.location.coordinates[0]
+        lat: shopOrder.assignedDeliveryBoy?.location?.coordinates?.[1] || 0,
+        lon: shopOrder.assignedDeliveryBoy?.location?.coordinates?.[0] || 0
       },
       customerLocation: {
         lat: currentOrder.deliveryAddress.latitude,

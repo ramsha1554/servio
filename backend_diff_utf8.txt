@@ -1,0 +1,476 @@
+﻿diff --git a/backend/controllers/item.controllers.js b/backend/controllers/item.controllers.js
+index 0c10f9c..af34f34 100644
+--- a/backend/controllers/item.controllers.js
++++ b/backend/controllers/item.controllers.js
+@@ -7,9 +7,18 @@ export const addItem = async (req, res) => {
+     try {
+         const { name, category, foodType, price } = req.body
+         let image;
++        
+         if (req.file) {
+             image = await uploadOnCloudinary(req.file.path)
++            if (!image) {
++                return res.status(500).json({ message: "Cloudinary upload failed." })
++            }
+         }
++
++        if (!image) {
++            return res.status(400).json({ message: "An image is strictly required for new items." })
++        }
++
+         const shop = await Shop.findOne({ owner: req.userId })
+         if (!shop) {
+             return res.status(400).json({ message: "shop not found" })
+@@ -26,15 +35,20 @@ export const addItem = async (req, res) => {
+             options: { sort: { updatedAt: -1 } }
+         })
+ 
+-        // Invalidate city items cache
+-        if (shop.city) {
+-            await redis.del(`items:city:${shop.city}`);
++        // Invalidate city items cache safely
++        try {
++            if (shop.city) {
++                await redis.del(`items:city:${shop.city}`);
++            }
++        } catch (redisError) {
++            console.error("Redis error:", redisError);
+         }
+ 
+         return res.status(201).json(shop)
+ 
+     } catch (error) {
+-        return res.status(500).json({ message: `add item error ${error}` })
++        console.error("addItem Error:", error);
++        return res.status(500).json({ message: error.message || "Internal Server Error" })
+     }
+ }
+ 
+@@ -43,12 +57,20 @@ export const editItem = async (req, res) => {
+         const itemId = req.params.itemId
+         const { name, category, foodType, price } = req.body
+         let image;
++        
+         if (req.file) {
+             image = await uploadOnCloudinary(req.file.path)
++            if (!image) {
++                return res.status(500).json({ message: "Cloudinary upload failed." })
++            }
+         }
+-        const item = await Item.findByIdAndUpdate(itemId, {
+-            name, category, foodType, price, image
+-        }, { new: true })
++        
++        const updateData = { name, category, foodType, price };
++        if (image) {
++            updateData.image = image;
++        }
++
++        const item = await Item.findByIdAndUpdate(itemId, updateData, { new: true })
+         if (!item) {
+             return res.status(400).json({ message: "item not found" })
+         }
+@@ -57,15 +79,20 @@ export const editItem = async (req, res) => {
+             options: { sort: { updatedAt: -1 } }
+         })
+ 
+-        // Invalidate city items cache
+-        if (shop.city) {
+-            await redis.del(`items:city:${shop.city}`);
++        // Invalidate city items cache safely
++        try {
++            if (shop.city) {
++                await redis.del(`items:city:${shop.city}`);
++            }
++        } catch (redisError) {
++            console.error("Redis error:", redisError);
+         }
+ 
+         return res.status(200).json(shop)
+ 
+     } catch (error) {
+-        return res.status(500).json({ message: `edit item error ${error}` })
++        console.error("editItem Error:", error);
++        return res.status(500).json({ message: error.message || "Internal Server Error" })
+     }
+ }
+ 
+@@ -116,29 +143,40 @@ export const getItemByCity = async (req, res) => {
+             return res.status(400).json({ message: "city is required" })
+         }
+ 
+-        // Check cache
+-        const cachedItems = await redis.get(`items:city:${city}`);
+-        if (cachedItems) {
+-            return res.status(200).json(JSON.parse(cachedItems));
++        // Check cache safely
++        try {
++            const cachedItems = await redis.get(`items:city:${city}`);
++            if (cachedItems) {
++                return res.status(200).json(JSON.parse(cachedItems));
++            }
++        } catch (redisError) {
++            console.error("Redis get error:", redisError);
+         }
+ 
+         const shops = await Shop.find({
+             city: { $regex: new RegExp(`^${city}$`, "i") }
+-        }).populate('items')
+-        if (!shops) {
+-            return res.status(400).json({ message: "shops not found" })
++        })
++        
++        if (!shops || shops.length === 0) {
++            return res.status(200).json([]) // Return empty array instead of 400
+         }
++        
+         const shopIds = shops.map((shop) => shop._id)
+ 
+         const items = await Item.find({ shop: { $in: shopIds } })
+ 
+-        // Set cache
+-        await redis.set(`items:city:${city}`, JSON.stringify(items), "EX", 300);
++        // Set cache safely
++        try {
++            await redis.set(`items:city:${city}`, JSON.stringify(items), "EX", 300);
++        } catch (redisError) {
++            console.error("Redis set error:", redisError);
++        }
+ 
+         return res.status(200).json(items)
+ 
+     } catch (error) {
+-        return res.status(500).json({ message: `get item by city error ${error}` })
++        console.error("getItemByCity Error:", error);
++        return res.status(500).json({ message: error.message || "Internal server error" })
+     }
+ }
+ 
+diff --git a/backend/controllers/order.controllers.js b/backend/controllers/order.controllers.js
+index 0be8612..c0539bf 100644
+--- a/backend/controllers/order.controllers.js
++++ b/backend/controllers/order.controllers.js
+@@ -347,12 +347,15 @@ export const updateOrderStatus = async (req, res) => {
+ 
+ export const getDeliveryBoyAssignment = async (req, res) => {
+     try {
++        console.log("=== getAssignments Start ===");
++        console.log("req.query:", req.query);
+         const deliveryBoyId = req.userId
+         let { latitude, longitude } = req.query
+ 
+         // Default to DB location if not provided in query
+         if (!latitude || !longitude) {
+             const deliveryBoy = await User.findById(deliveryBoyId)
++            console.log("deliveryBoy fetched:", deliveryBoy ? deliveryBoy.email : "not found", deliveryBoy?.location);
+             if (deliveryBoy && deliveryBoy.location && deliveryBoy.location.coordinates[0] !== 0) {
+                 longitude = deliveryBoy.location.coordinates[0]
+                 latitude = deliveryBoy.location.coordinates[1]
+@@ -374,15 +377,14 @@ export const getDeliveryBoyAssignment = async (req, res) => {
+                 items: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId)).shopOrderItems || [],
+                 subtotal: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId))?.subtotal
+             }))
+-            return res.status(200).json(formated)
++            return res.status(200).json({ success: true, assignments: formated })
+         }
+ 
+         const lon1 = Number(longitude)
+         const lat1 = Number(latitude)
+ 
+-        // 1. Find Orders near the delivery boy (5km radius)
+-        // Using MongoDB geospatial query which is much faster than JS filtering
+-        const nearbyOrders = await Order.find({
++        console.log("Querying orders with lon1:", lon1, "lat1:", lat1);
++        const geoQuery = {
+             location: {
+                 $near: {
+                     $geometry: {
+@@ -392,12 +394,17 @@ export const getDeliveryBoyAssignment = async (req, res) => {
+                     $maxDistance: 5000 // 5km
+                 }
+             }
+-        }).select("_id");
++        };
++        console.log("MongoDB Query:", JSON.stringify(geoQuery, null, 2));
++
++        // 1. Find Orders near the delivery boy (5km radius)
++        // Using MongoDB geospatial query which is much faster than JS filtering
++        const nearbyOrders = await Order.find(geoQuery).select("_id");
+ 
+         const nearbyOrderIds = nearbyOrders.map(o => o._id);
+ 
+         if (nearbyOrderIds.length === 0) {
+-            return res.status(200).json([])
++            return res.status(200).json({ success: true, assignments: [] })
+         }
+ 
+         // 2. Find Broadcasted Assignments corresponding to these nearby orders
+@@ -418,9 +425,11 @@ export const getDeliveryBoyAssignment = async (req, res) => {
+             subtotal: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId))?.subtotal
+         }))
+ 
+-        return res.status(200).json(formated)
++        return res.status(200).json({ success: true, assignments: formated })
+     } catch (error) {
+-        return res.status(500).json({ message: `get Assignment error ${error}` })
++        console.error("=== getAssignments Error ===");
++        console.error(error);
++        return res.status(500).json({ success: false, message: `get Assignment error: ${error.message}` })
+     }
+ }
+ 
+@@ -518,9 +527,12 @@ export const getCurrentOrder = async (req, res) => {
+             customerLocation
+         })
+ 
+-
+     } catch (error) {
+-
++        console.error("getCurrentOrder error:", error)
++        return res.status(500).json({ 
++            success: false, 
++            message: "getCurrentOrder error " + error.message 
++        })
+     }
+ }
+ 
+diff --git a/backend/controllers/shop.controllers.js b/backend/controllers/shop.controllers.js
+index 1964e27..091d487 100644
+--- a/backend/controllers/shop.controllers.js
++++ b/backend/controllers/shop.controllers.js
+@@ -4,79 +4,100 @@ import redis from "../config/redis.js";
+ 
+ export const createEditShop = async (req, res) => {
+     try {
+-        const { name, city, state, address } = req.body
++        const { name, city, state, address, ownerId } = req.body;
++        // Use provided ownerId or fallback to req.userId
++        const finalOwnerId = ownerId || req.userId;
++        
+         let image;
+         if (req.file) {
+-            console.log(req.file)
++            console.log("Uploading file to Cloudinary:", req.file.path);
+             image = await uploadOnCloudinary(req.file.path)
++            if (!image) {
++                return res.status(500).json({ message: "Image upload failed. Please check Cloudinary configuration." })
++            }
+         }
+-        let shop = await Shop.findOne({ owner: req.userId })
++
++        let shop = await Shop.findOne({ owner: finalOwnerId })
+         const oldCity = shop?.city;
+ 
+         if (!shop) {
++            if (!image) {
++                return res.status(400).json({ message: "A shop image is strictly required when creating a new shop." })
++            }
+             shop = await Shop.create({
+-                name, city, state, address, image, owner: req.userId, categories: req.body.categories, location: req.body.location
++                name, city, state, address, image, owner: finalOwnerId, categories: req.body.categories, location: req.body.location
+             })
+         } else {
+-            shop = await Shop.findByIdAndUpdate(shop._id, {
+-                name, city, state, address, image, owner: req.userId, categories: req.body.categories, location: req.body.location
+-            }, { new: true })
++            const updateData = { name, city, state, address, owner: finalOwnerId, categories: req.body.categories, location: req.body.location }
++            if (image) {
++                updateData.image = image;
++            }
++            shop = await Shop.findByIdAndUpdate(shop._id, updateData, { new: true })
+         }
+ 
+         await shop.populate("owner items")
+ 
+-        // Invalidate Cache
+-        if (city) {
+-            await redis.del(`shops:${city}`);
+-        }
+-        if (oldCity && oldCity !== city) {
+-            await redis.del(`shops:${oldCity}`);
++        // Invalidate Cache Safely
++        try {
++            if (city) await redis.del(`shops:${city}`);
++            if (oldCity && oldCity !== city) await redis.del(`shops:${oldCity}`);
++        } catch (redisError) {
++            console.error("Redis cache invalidation error:", redisError);
+         }
+ 
+         return res.status(201).json(shop)
+     } catch (error) {
+-        return res.status(500).json({ message: `create shop error ${error}` })
++        console.error("createEditShop Error:", error);
++        return res.status(500).json({ message: error.message || "Internal server error" })
+     }
+ }
+ 
+ export const getMyShop = async (req, res) => {
+     try {
+-        console.log("Fetching shop for Owner ID:", req.userId);
+         const shop = await Shop.findOne({ owner: req.userId }).populate("owner").populate({
+             path: "items",
+             options: { sort: { updatedAt: -1 } }
+         })
+         if (!shop) {
+-            console.log("Shop NOT found for this owner.");
+-            return null
++            return res.status(200).json(null)
+         }
+-        console.log("Shop Found:", shop.name);
+         return res.status(200).json(shop)
+     } catch (error) {
+-        return res.status(500).json({ message: `get my shop error ${error}` })
++        console.error("getMyShop Error:", error);
++        return res.status(500).json({ message: error.message || "Internal server error" })
+     }
+ }
+ 
+ export const getShopByCity = async (req, res) => {
+     try {
+         const { city } = req.params
+-
+-        const cachedShops = await redis.get(`shops:${city}`);
+-        if (cachedShops) {
+-            return res.status(200).json(JSON.parse(cachedShops));
++        
++        try {
++            const cachedShops = await redis.get(`shops:${city}`);
++            if (cachedShops) {
++                return res.status(200).json(JSON.parse(cachedShops));
++            }
++        } catch (redisError) {
++            console.error("Redis get error:", redisError);
+         }
+ 
+         const shops = await Shop.find({
+             city: { $regex: new RegExp(`^${city}$`, "i") }
+         }).populate('items')
+-        if (!shops) {
+-            return res.status(400).json({ message: "shops not found" })
++        
++        if (!shops || shops.length === 0) {
++            return res.status(200).json([]) // Return empty array instead of 400
+         }
+ 
+-        await redis.set(`shops:${city}`, JSON.stringify(shops), "EX", 300);
++        try {
++            await redis.set(`shops:${city}`, JSON.stringify(shops), "EX", 300);
++        } catch (redisError) {
++            console.error("Redis set error:", redisError);
++        }
+ 
+         return res.status(200).json(shops)
+     } catch (error) {
+-        return res.status(500).json({ message: `get shop by city error ${error}` })
++        console.error("getShopByCity Error:", error);
++        return res.status(500).json({ message: error.message || "Internal server error" })
+     }
+ }
+\ No newline at end of file
+diff --git a/backend/logs/combined.log b/backend/logs/combined.log
+index a79794f..b412f1e 100644
+--- a/backend/logs/combined.log
++++ b/backend/logs/combined.log
+@@ -94,3 +94,53 @@
+ {"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T10:26:32.991Z"}
+ {"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T10:55:07.791Z"}
+ {"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T10:55:08.700Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T10:55:22.011Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T10:55:22.649Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T11:15:20.782Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T11:15:21.713Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T11:30:50.171Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T11:30:51.059Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T11:31:05.575Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T11:31:06.252Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T11:37:27.051Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T11:37:27.927Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T16:55:22.904Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T16:55:24.397Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T16:57:00.222Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T16:57:01.100Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T16:57:16.602Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T16:57:17.396Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:05:15.931Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:05:16.791Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:05:26.683Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:05:27.414Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:05:57.525Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:05:58.260Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:06:18.259Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:06:20.021Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:16:24.213Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:16:25.394Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:18:04.884Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:18:05.717Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:33:35.365Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:33:36.452Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:37:53.969Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:37:56.219Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:42:14.690Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:42:15.429Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:42:41.713Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:42:42.660Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:44:42.422Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:44:43.315Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:49:00.525Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:49:01.381Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:49:35.135Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:49:36.107Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:50:00.179Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:50:00.862Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:50:16.072Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:50:16.728Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-06T17:51:57.197Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-06T17:52:01.154Z"}
++{"level":"info","message":"Server started at port 8000","timestamp":"2026-05-07T08:16:55.260Z"}
++{"level":"info","message":"Database connected successfully","timestamp":"2026-05-07T08:16:56.567Z"}
+diff --git a/backend/models/order.model.js b/backend/models/order.model.js
+index 68af9ae..e437f2f 100644
+--- a/backend/models/order.model.js
++++ b/backend/models/order.model.js
+@@ -73,8 +73,7 @@ const orderSchema = new mongoose.Schema({
+             default: 'Point'
+         },
+         coordinates: {
+-            type: [Number],
+-            index: '2dsphere'
++            type: [Number]
+         }
+     },
+     totalAmount: {
+@@ -96,5 +95,7 @@ const orderSchema = new mongoose.Schema({
+     }
+ }, { timestamps: true })
+ 
++orderSchema.index({ location: "2dsphere" })
++
+ const Order = mongoose.model("Order", orderSchema)
+ export default Order
+\ No newline at end of file
+diff --git a/backend/models/shop.model.js b/backend/models/shop.model.js
+index 26ff73e..9e18fcc 100644
+--- a/backend/models/shop.model.js
++++ b/backend/models/shop.model.js
+@@ -35,7 +35,7 @@ const shopSchema = new mongoose.Schema({
+     }],
+     location: {
+         type: { type: String, enum: ['Point'], default: 'Point' },
+-        coordinates: { type: [Number], default: [0, 0] }
++        coordinates: { type: [Number] }
+     },
+     isVerified: {
+         type: Boolean,
+diff --git a/backend/models/user.model.js b/backend/models/user.model.js
+index dc48d57..a389230 100644
+--- a/backend/models/user.model.js
++++ b/backend/models/user.model.js
+@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
+     },
+    location:{
+ type:{type:String,enum:['Point'],default:'Point'},
+-coordinates:{type:[Number],default:[0,0]}
++coordinates:{type:[Number]}
+    },
+    isBanned:{
+         type:Boolean,

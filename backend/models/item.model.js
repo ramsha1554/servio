@@ -15,7 +15,8 @@ const itemSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ["Snacks",
+        enum: [
+            "Snacks",
             "Main Course",
             "Desserts",
             "Pizza",
@@ -25,6 +26,10 @@ const itemSchema = new mongoose.Schema({
             "North Indian",
             "Chinese",
             "Fast Food",
+            "Biryani",
+            "Thali",
+            "Beverages",
+            "Sweets",
             "Others"
         ],
         required:true
