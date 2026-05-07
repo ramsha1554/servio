@@ -1,5 +1,6 @@
 import { Worker } from "bullmq";
 import { sendOtpMail, sendDeliveryOtpMail } from "../utils/mail.js";
+import redis from "../config/redis.js";
 
 const emailWorker = new Worker("email-queue", async (job) => {
     console.log(`Processing Job: ${job.name}`);
@@ -19,10 +20,7 @@ const emailWorker = new Worker("email-queue", async (job) => {
         throw error; // Let BullMQ handle retries
     }
 }, {
-    connection: {
-        host: "localhost",
-        port: 6379
-    }
+    connection: redis
 });
 
 // Basic event listeners
