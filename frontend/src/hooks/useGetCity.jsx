@@ -5,18 +5,27 @@ import { useDispatch, useSelector } from 'react-redux'
 import {  setCurrentAddress, setCurrentCity, setCurrentState, setUserData } from '../redux/userSlice'
 import { setAddress, setLocation } from '../redux/mapSlice'
 
+import { maharashtraCities } from '../components/CitySelectorModal'
+
 function useGetCity() {
     const dispatch=useDispatch()
-    const { currentCity }=useSelector(state=>state.user)
+    const { currentCity, cityManuallySelected }=useSelector(state=>state.user)
     const apiKey=import.meta.env.VITE_GEOAPIKEY
     useEffect(()=>{
-        if (currentCity) return;
+        if (cityManuallySelected) return;
+        if (currentCity && !cityManuallySelected) return;
+
         navigator.geolocation.getCurrentPosition(async (position)=>{
             const latitude=position.coords.latitude
             const longitude=position.coords.longitude
             dispatch(setLocation({lat:latitude,lon:longitude}))
             const result=await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apiKey}`)
-            dispatch(setCurrentCity(result?.data?.results[0].city||result?.data?.results[0].county))
+            
+            const city = result?.data?.results[0].city||result?.data?.results[0].county;
+            if (city && maharashtraCities.includes(city)) {
+                dispatch(setCurrentCity(city))
+                localStorage.setItem("servio_city", city)
+            }
             dispatch(setCurrentState(result?.data?.results[0].state))
             dispatch(setCurrentAddress(result?.data?.results[0].address_line2 || result?.data?.results[0].address_line1 ))
             dispatch(setAddress(result?.data?.results[0].address_line2))
