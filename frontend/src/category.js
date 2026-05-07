@@ -21,5 +21,9 @@ export const categories = [
     { "category": "South Indian", "image": image7 },
     { "category": "North Indian", "image": image8 },
     { "category": "Chinese", "image": image9 },
-    { "category": "Fast Food", "image": image10 }
+    { "category": "Fast Food", "image": image10 },
+    { "category": "Biryani", "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&q=80" },
+    { "category": "Thali", "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200&q=80" },
+    { "category": "Beverages", "image": "https://images.unsplash.com/photo-1571167366136-b57e2e29de2d?w=200&q=80" },
+    { "category": "Sweets", "image": "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=200&q=80" }
 ]

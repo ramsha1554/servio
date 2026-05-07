@@ -59,39 +59,69 @@ const runSeed = async () => {
     await connectDB();
     
     console.log("Cleaning up old seed data...");
-    const usersToDelete = await User.find({ 
-        $or: [
-            { email: /@servio\.com$/ },
-            { email: 'admin@servio.com' }
-        ]
-    });
-    const userIds = usersToDelete.map(u => u._id);
-    
-    const shopsToDelete = await Shop.find({ owner: { $in: userIds } });
-    const shopIds = shopsToDelete.map(s => s._id);
-
-    const ordersToDelete = await Order.find({ user: { $in: userIds } });
-    const orderIds = ordersToDelete.map(o => o._id);
-
-    await DeliveryAssignment.deleteMany({ order: { $in: orderIds } });
-    await Order.deleteMany({ _id: { $in: orderIds } });
-    await Item.deleteMany({ shop: { $in: shopIds } });
-    await Shop.deleteMany({ _id: { $in: shopIds } });
-    await User.deleteMany({ _id: { $in: userIds } });
-
+    await User.deleteMany({ email: { $ne: "admin@servio.com" } });
+    await Shop.deleteMany({});
+    await Item.deleteMany({});
+    await Order.deleteMany({});
+    await DeliveryAssignment.deleteMany({});
     console.log("Cleanup finished.");
+
+    const getNonVegKeywords = [
+        "chicken", "mutton", "fish", "prawn", "egg", 
+        "keema", "lamb", "beef", "meat", "non-veg",
+        "seekh", "boti", "kheema"
+    ];
+    
+    const getFoodType = (itemName) => {
+        const lower = itemName.toLowerCase();
+        return getNonVegKeywords.some(k => lower.includes(k)) 
+          ? "non veg" 
+          : "veg";
+    };
+
+    const uniqueUnsplashIds = [
+        "1599974579688-8dbdd335c77f", "1603894584373-5ac82b2ae398", "1567188040759-fb8a883dc6d8",
+        "1610192244261-3f33de3f55e4", "1589301760014-d929f3979dbc", "1513104890138-7c749659a591",
+        "1568901346375-23c9450c58cd", "1603133872878-684f208fb84b", "1569718212165-3a8278d5f624",
+        "1601050690597-df0568f70950", "1558618666-fcd25c85cd64", "1571167366136-b57e2e29de2d",
+        "1622597467836-f3285f2131b8", "1606491956689-2ea866880c84", "1606755962773-d324e0a13086",
+        "1546069901-ba9599a7e63c", "1546833999-b9f581a1996d", "1601493700631-2b16ec4b4716",
+        "1580915411954-282cb1b0d780", "1517248135467-4c7edcad34c4", "1565299624946-b28f40a0ae38",
+        "1567620905732-2d1ec7ab7445", "1565958011703-44f9829ba187", "1484723091791-c0e7e53f0a1c",
+        "1512621776951-a57141f2eefd", "1626082927389-6cd097cdc6ec", "1589119908995-c6837fa14848",
+        "1586788680434-30d32443685f", "1563379091339-03b21ab4a4f8", "1541592106381-b31e9674c0e5",
+        "1599487488170-d11ec9c172f0", "1540420773420-3366772f4999", "1565557623262-b51c2513a641",
+        "1571091718767-18b5b1457add", "1562967963-ed7852c344f3", "1631452180519-c014fe946bc7",
+        "1578985545062-69928b1d9587", "1528735602780-2552fd46c7af", "1621841957884-f4336c5df58e",
+        "1554502078-ef0fc409efce", "1649168910609-0c6776104e76", "1561043433-aaf687c4cf04",
+        "1645112411341-6c4fd023714a", "1631515243349-e0cb75fb8d3a", "1552611052-33e04de081de",
+        "1589301760014-d929f39ce9b1", "1558961363-fa8fdf82db35", "1622597467836-f38240662c8c",
+        "1546833999-b9f581a1996d", "1601050690597-df0568f70950", "1504669886280-be36f5da89ce",
+        "1543339308-417163c467ed", "1565299524946-b28f40a0ae38", "1564834724105-918b73d1b9e0",
+        "1604908176997-125f25cc6f3d", "1598514982205-f36b96d1e8d4", "1565557623262-b51c2513a641",
+        "1511690655022-000c0f91ab0c", "1624233630663-e380540d588a", "1611077544390-e51c8901b0f5"
+    ];
+    let uniqueIdCounter = 0;
+    const getUniqueUnsplash = () => {
+        const id = uniqueUnsplashIds[uniqueIdCounter % uniqueUnsplashIds.length];
+        uniqueIdCounter++;
+        return `https://images.unsplash.com/photo-${id}?w=400&q=80`;
+    };
 
     const defaultPassword = await bcrypt.hash("Servio@123", 10);
 
     // 1. CREATE ADMIN
-    await User.create({
-        fullName: "System Admin",
-        email: "admin@servio.com",
-        password: defaultPassword,
-        mobile: "9000000000",
-        role: "admin",
-        location: { type: "Point", coordinates: locations["Osmanpura"] }
-    });
+    let admin = await User.findOne({ email: "admin@servio.com" });
+    if (!admin) {
+        admin = await User.create({
+            fullName: "System Admin",
+            email: "admin@servio.com",
+            password: defaultPassword,
+            mobile: "9000000000",
+            role: "admin",
+            location: { type: "Point", coordinates: locations["Osmanpura"] }
+        });
+    }
 
     // 2. CREATE CUSTOMERS (10)
     const customerNames = [
@@ -198,12 +228,21 @@ const runSeed = async () => {
         });
 
         // CREATE ITEMS (6 per shop)
-        const itemNames = [`Special ${spec.category} 1`, `Classic ${spec.category} 2`, `Premium ${spec.category} 3`, `Family ${spec.category} 4`, `Spicy ${spec.category} 5`, `Deluxe ${spec.category} 6`];
+        const itemNames = [
+            `Chicken ${spec.category} Special 1`, 
+            `Veg ${spec.category} Classic 2`, 
+            `Premium ${spec.category} 3`, 
+            `Family Chicken Bucket 4`, 
+            `Spicy Mutton ${spec.category} 5`, 
+            `Deluxe Veg ${spec.category} 6`
+        ];
         
         for (let i = 0; i < itemNames.length; i++) {
-            const foodType = i % 2 === 0 ? "veg" : "non veg";
-            const price = 50 + (i * 30);
-            const foodImgUrl = fallbackFoodImages[i % fallbackFoodImages.length];
+            const foodType = getFoodType(itemNames[i]);
+            // Price between 40 and 450
+            const price = Math.floor(Math.random() * 411) + 40; 
+            
+            const foodImgUrl = getUniqueUnsplash();
             const itemImage = await uploadImage(foodImgUrl, "servio/items", `${spec.shopName} Item ${i + 1}`);
             
             const item = await Item.create({

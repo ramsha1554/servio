@@ -1,0 +1,1076 @@
+{
+  "problem1": [
+    {
+      "shopName": "Syeda Ramsah Anjum",
+      "shopCats": [],
+      "itemName": "pav bhaaji",
+      "itemCat": "Others"
+    },
+    {
+      "shopName": "Deccan Spice",
+      "shopCats": [],
+      "itemName": "butter naan ",
+      "itemCat": "Main Course"
+    },
+    {
+      "shopName": "Deccan Spice",
+      "shopCats": [],
+      "itemName": "butter naan ",
+      "itemCat": "Main Course"
+    }
+  ],
+  "problem2": [
+    {
+      "name": "Gulab Jamun",
+      "url": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Corn",
+      "url": "https://images.unsplash.com/photo-1517244683847-745431346aea?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Chicken Burger",
+      "url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Corn",
+      "url": "https://images.unsplash.com/photo-1517244683847-745431346aea?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Kadai Paneer",
+      "url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fried Rice",
+      "url": "https://images.unsplash.com/photo-1603133872878-684f10842619?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Gulab Jamun",
+      "url": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Kadai Paneer",
+      "url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Dum Biryani",
+      "url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Chicken Burger",
+      "url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Gulab Jamun",
+      "url": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fish Fry",
+      "url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Club Sandwich",
+      "url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fresh Green Salad",
+      "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Margherita Pizza",
+      "url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Club Sandwich",
+      "url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Family Chicken Bucket",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chocolate Brownie",
+      "url": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Family Chicken Bucket",
+      "url": "https://images.unsplash.com/photo-1562967963-ed7852c344f3?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Unlimited Veg Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Dum Biryani",
+      "url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Margherita Pizza",
+      "url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Unlimited Veg Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Hakka Noodles",
+      "url": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Cheese Burger",
+      "url": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chole Bhature",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Chicken",
+      "url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Deluxe Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Gulab Jamun",
+      "url": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Chicken",
+      "url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Gulab Jamun",
+      "url": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Chicken",
+      "url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chocolate Brownie",
+      "url": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dal Makhani",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Cheese Burger",
+      "url": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dal Makhani",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Masala Dosa",
+      "url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Vegetable Au Gratin",
+      "url": "https://images.unsplash.com/photo-1621841957884-f4336c5df58e?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Unlimited Veg Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Masala Dosa",
+      "url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "French Fries",
+      "url": "https://images.unsplash.com/photo-1541592106381-b31e9674c0e5?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Cheese Burger",
+      "url": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Naan",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Family Chicken Bucket",
+      "url": "https://images.unsplash.com/photo-1562967963-ed7852c344f3?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Tofu Spinach Curry",
+      "url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Tofu Spinach Curry",
+      "url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Kadai Paneer",
+      "url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chocolate Brownie",
+      "url": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Deluxe Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Club Sandwich",
+      "url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chole Bhature",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fresh Green Salad",
+      "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dhokla",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Red Velvet Jar Cake",
+      "url": "https://images.unsplash.com/photo-1616031037011-087000171ea3?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Kofta",
+      "url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Naan",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chole Bhature",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Kadai Paneer",
+      "url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Kofta",
+      "url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dhokla",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Masala Dosa",
+      "url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fried Rice",
+      "url": "https://images.unsplash.com/photo-1603133872878-684f10842619?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Unlimited Veg Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dal Makhani",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Masala Dosa",
+      "url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Margherita Pizza",
+      "url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dhokla",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Naan",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Hakka Noodles",
+      "url": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Corn",
+      "url": "https://images.unsplash.com/photo-1517244683847-745431346aea?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fresh Green Salad",
+      "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Deluxe Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Hakka Noodles",
+      "url": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Vegetable Au Gratin",
+      "url": "https://images.unsplash.com/photo-1621841957884-f4336c5df58e?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Naan",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Hakka Noodles",
+      "url": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Chicken",
+      "url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Tofu Spinach Curry",
+      "url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Deluxe Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Club Sandwich",
+      "url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Margherita Pizza",
+      "url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Club Sandwich",
+      "url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Kofta",
+      "url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Cheese Burger",
+      "url": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Unlimited Veg Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Masala Dosa",
+      "url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Chicken",
+      "url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fresh Green Salad",
+      "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fried Rice",
+      "url": "https://images.unsplash.com/photo-1603133872878-684f10842619?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Red Velvet Jar Cake",
+      "url": "https://images.unsplash.com/photo-1586788680434-30d32443685f?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Tofu Spinach Curry",
+      "url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dal Makhani",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "French Fries",
+      "url": "https://images.unsplash.com/photo-1541592106381-b31e9674c0e5?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Butter Naan",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Red Velvet Jar Cake",
+      "url": "https://images.unsplash.com/photo-1586788680434-30d32443685f?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chole Bhature",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fried Rice",
+      "url": "https://images.unsplash.com/photo-1603133872878-684f10842619?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Kofta",
+      "url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chocolate Brownie",
+      "url": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chole Bhature",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Dum Biryani",
+      "url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Corn",
+      "url": "https://images.unsplash.com/photo-1554502078-ef0fc409efce?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Dum Biryani",
+      "url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fresh Green Salad",
+      "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Cheese Burger",
+      "url": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Vegetable Au Gratin",
+      "url": "https://images.unsplash.com/photo-1621841957884-f4336c5df58e?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dhokla",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fish Fry",
+      "url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Chicken Burger",
+      "url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Veg Hakka Noodles",
+      "url": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Chicken Burger",
+      "url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "French Fries",
+      "url": "https://images.unsplash.com/photo-1541592106381-b31e9674c0e5?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Tofu Spinach Curry",
+      "url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Vegetable Au Gratin",
+      "url": "https://images.unsplash.com/photo-1621841957884-f4336c5df58e?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Red Velvet Jar Cake",
+      "url": "https://images.unsplash.com/photo-1586788680434-30d32443685f?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Corn",
+      "url": "https://images.unsplash.com/photo-1517244683847-745431346aea?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Family Chicken Bucket",
+      "url": "https://images.unsplash.com/photo-1562967963-ed7852c344f3?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fish Fry",
+      "url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Vegetable Au Gratin",
+      "url": "https://images.unsplash.com/photo-1649168910609-0c6776104e76?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dal Makhani",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Family Chicken Bucket",
+      "url": "https://images.unsplash.com/photo-1562967963-ed7852c344f3?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Margherita Pizza",
+      "url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Paneer Kofta",
+      "url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Kadai Paneer",
+      "url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Crispy Chicken Burger",
+      "url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fried Rice",
+      "url": "https://images.unsplash.com/photo-1561043433-aaf687c4cf04?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fish Fry",
+      "url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Red Velvet Jar Cake",
+      "url": "https://images.unsplash.com/photo-1586788680434-30d32443685f?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chicken Dum Biryani",
+      "url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "French Fries",
+      "url": "https://images.unsplash.com/photo-1541592106381-b31e9674c0e5?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Dhokla",
+      "url": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Fish Fry",
+      "url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Chocolate Brownie",
+      "url": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Deluxe Thali",
+      "url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "French Fries",
+      "url": "https://images.unsplash.com/photo-1541592106381-b31e9674c0e5?q=80&w=1000&auto=format&fit=crop"
+    },
+    {
+      "name": "Spicy North Indian 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Biryani 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Fast Food 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Chinese 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy South Indian 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Pizza 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Sweets 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Beverages 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Thali 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    },
+    {
+      "name": "Spicy Snacks 5",
+      "url": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c"
+    }
+  ],
+  "problem3": {
+    "items": [
+      {
+        "_id": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Fresh Green Salad",
+          "Fresh Green Salad",
+          "Fresh Green Salad",
+          "Fresh Green Salad",
+          "Fresh Green Salad"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Crispy Chicken Burger",
+          "Crispy Chicken Burger",
+          "Crispy Chicken Burger",
+          "Crispy Chicken Burger",
+          "Crispy Chicken Burger"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Masala Dosa",
+          "Masala Dosa",
+          "Masala Dosa",
+          "Masala Dosa",
+          "Masala Dosa"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Tofu Spinach Curry",
+          "Tofu Spinach Curry",
+          "Tofu Spinach Curry",
+          "Tofu Spinach Curry",
+          "Tofu Spinach Curry"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Paneer Kofta",
+          "Paneer Kofta",
+          "Paneer Kofta",
+          "Paneer Kofta",
+          "Paneer Kofta"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1541592106381-b31e9674c0e5?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "French Fries",
+          "French Fries",
+          "French Fries",
+          "French Fries",
+          "French Fries"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Fish Fry",
+          "Fish Fry",
+          "Fish Fry",
+          "Fish Fry",
+          "Fish Fry"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=1000&auto=format&fit=crop",
+        "count": 16,
+        "names": [
+          "Family Chicken Bucket",
+          "Chole Bhature",
+          "Butter Naan",
+          "Chole Bhature",
+          "Dhokla",
+          "Butter Naan",
+          "Chole Bhature",
+          "Dhokla",
+          "Dhokla",
+          "Butter Naan",
+          "Butter Naan",
+          "Butter Naan",
+          "Chole Bhature",
+          "Chole Bhature",
+          "Dhokla",
+          "Dhokla"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Gulab Jamun",
+          "Gulab Jamun",
+          "Gulab Jamun",
+          "Gulab Jamun",
+          "Gulab Jamun"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1586788680434-30d32443685f?q=80&w=1000&auto=format&fit=crop",
+        "count": 4,
+        "names": [
+          "Red Velvet Jar Cake",
+          "Red Velvet Jar Cake",
+          "Red Velvet Jar Cake",
+          "Red Velvet Jar Cake"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Kadai Paneer",
+          "Kadai Paneer",
+          "Kadai Paneer",
+          "Kadai Paneer",
+          "Kadai Paneer"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Chicken Dum Biryani",
+          "Chicken Dum Biryani",
+          "Chicken Dum Biryani",
+          "Chicken Dum Biryani",
+          "Chicken Dum Biryani"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1517244683847-745431346aea?q=80&w=1000&auto=format&fit=crop",
+        "count": 4,
+        "names": [
+          "Crispy Corn",
+          "Crispy Corn",
+          "Crispy Corn",
+          "Crispy Corn"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=1000&auto=format&fit=crop",
+        "count": 15,
+        "names": [
+          "Unlimited Veg Thali",
+          "Unlimited Veg Thali",
+          "Deluxe Thali",
+          "Dal Makhani",
+          "Dal Makhani",
+          "Unlimited Veg Thali",
+          "Deluxe Thali",
+          "Unlimited Veg Thali",
+          "Dal Makhani",
+          "Deluxe Thali",
+          "Deluxe Thali",
+          "Unlimited Veg Thali",
+          "Dal Makhani",
+          "Dal Makhani",
+          "Deluxe Thali"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Chicken Club Sandwich",
+          "Chicken Club Sandwich",
+          "Chicken Club Sandwich",
+          "Chicken Club Sandwich",
+          "Chicken Club Sandwich"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1621841957884-f4336c5df58e?q=80&w=1000&auto=format&fit=crop",
+        "count": 4,
+        "names": [
+          "Vegetable Au Gratin",
+          "Vegetable Au Gratin",
+          "Vegetable Au Gratin",
+          "Vegetable Au Gratin"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1484723091791-c0e7e53f0a1c",
+        "count": 10,
+        "names": [
+          "Spicy North Indian 5",
+          "Spicy Biryani 5",
+          "Spicy Fast Food 5",
+          "Spicy Chinese 5",
+          "Spicy South Indian 5",
+          "Spicy Pizza 5",
+          "Spicy Sweets 5",
+          "Spicy Beverages 5",
+          "Spicy Thali 5",
+          "Spicy Snacks 5"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Butter Chicken",
+          "Butter Chicken",
+          "Butter Chicken",
+          "Butter Chicken",
+          "Butter Chicken"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Veg Hakka Noodles",
+          "Veg Hakka Noodles",
+          "Veg Hakka Noodles",
+          "Veg Hakka Noodles",
+          "Veg Hakka Noodles"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Margherita Pizza",
+          "Margherita Pizza",
+          "Margherita Pizza",
+          "Margherita Pizza",
+          "Margherita Pizza"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Paneer Butter Masala",
+          "Paneer Butter Masala",
+          "Paneer Butter Masala",
+          "Paneer Butter Masala",
+          "Paneer Butter Masala"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Veg Cheese Burger",
+          "Veg Cheese Burger",
+          "Veg Cheese Burger",
+          "Veg Cheese Burger",
+          "Veg Cheese Burger"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1562967963-ed7852c344f3?q=80&w=1000&auto=format&fit=crop",
+        "count": 4,
+        "names": [
+          "Family Chicken Bucket",
+          "Family Chicken Bucket",
+          "Family Chicken Bucket",
+          "Family Chicken Bucket"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1000&auto=format&fit=crop",
+        "count": 5,
+        "names": [
+          "Chocolate Brownie",
+          "Chocolate Brownie",
+          "Chocolate Brownie",
+          "Chocolate Brownie",
+          "Chocolate Brownie"
+        ]
+      },
+      {
+        "_id": "https://images.unsplash.com/photo-1603133872878-684f10842619?q=80&w=1000&auto=format&fit=crop",
+        "count": 4,
+        "names": [
+          "Fried Rice",
+          "Fried Rice",
+          "Fried Rice",
+          "Fried Rice"
+        ]
+      }
+    ],
+    "shops": []
+  },
+  "problem4": [],
+  "problem6": [
+    {
+      "name": "Syeda Ramsah Anjum",
+      "address": "Apex Road, Chhatrapati Sambhaji Nagar - 431003, MH, India",
+      "city": "Chhatrapati Sambhaji Nagar"
+    },
+    {
+      "name": "My Shop",
+      "address": "Apex Road",
+      "city": "Chhatrapati Sambhaji Nagar"
+    },
+    {
+      "name": " Spice Route Kitchen",
+      "address": "hop No. 12, Nirala Bazar Road, Near City hop No. 12, Nirala Bazar Road, Near City ",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Deccan Spice",
+      "address": "Near Shivaji Statue , Kranti Chowk, Station Rd",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Spice Garden",
+      "address": "Spice Garden Main Road, Osmanpura",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.3262,
+        19.8762
+      ]
+    },
+    {
+      "name": "Biryani House",
+      "address": "Biryani House Main Road, Garkheda",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.3652,
+        19.8856
+      ]
+    },
+    {
+      "name": "Burger Hub",
+      "address": "Burger Hub Main Road, Cidco",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.3692,
+        19.9025
+      ]
+    },
+    {
+      "name": "Dragon Express",
+      "address": "Dragon Express Main Road, Aurangpura",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.319,
+        19.885
+      ]
+    },
+    {
+      "name": "Dosa Plaza",
+      "address": "Dosa Plaza Main Road, Cantonment",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.3433,
+        19.868
+      ]
+    },
+    {
+      "name": "Pizza Corner",
+      "address": "Pizza Corner Main Road, Samarth Nagar",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.338,
+        19.892
+      ]
+    },
+    {
+      "name": "Sweet Cravings",
+      "address": "Sweet Cravings Main Road, N-1",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.352,
+        19.91
+      ]
+    },
+    {
+      "name": "Juice Lounge",
+      "address": "Juice Lounge Main Road, N-6",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.358,
+        19.918
+      ]
+    },
+    {
+      "name": "Royal Thali",
+      "address": "Royal Thali Main Road, Osmanpura",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.3262,
+        19.8762
+      ]
+    },
+    {
+      "name": "Street Bites",
+      "address": "Street Bites Main Road, Garkheda",
+      "city": "Chhatrapati Sambhajinagar",
+      "coordinates": [
+        75.3652,
+        19.8856
+      ]
+    }
+  ],
+  "problem8": {
+    "distinctItemCats": [
+      "Beverages",
+      "Biryani",
+      "Chinese",
+      "Desserts",
+      "Fast Food",
+      "Main Course",
+      "North Indian",
+      "Others",
+      "Pizza",
+      "Sandwiches",
+      "Snacks",
+      "South Indian",
+      "Sweets",
+      "Thali"
+    ],
+    "distinctShopCats": [
+      "Beverages",
+      "Biryani",
+      "Chinese",
+      "Fast Food",
+      "North Indian",
+      "Pizza",
+      "Snacks",
+      "South Indian",
+      "Sweets",
+      "Thali"
+    ]
+  }
+}

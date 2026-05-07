@@ -163,7 +163,7 @@ export const getItemByCity = async (req, res) => {
         
         const shopIds = shops.map((shop) => shop._id)
 
-        const items = await Item.find({ shop: { $in: shopIds } })
+        const items = await Item.find({ shop: { $in: shopIds } }).populate("shop", "name image address")
 
         // Set cache safely
         try {
