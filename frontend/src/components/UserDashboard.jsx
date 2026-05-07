@@ -4,6 +4,7 @@ import { categories } from '../category'
 import CategoryCard from './CategoryCard'
 import ShopCard from './ShopCard' // Import ShopCard
 import PromoCarousel from './PromoCarousel' // Import PromoCarousel
+import CitySelectorModal from './CitySelectorModal'
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6"; // Cleaner icons
 import { useSelector } from 'react-redux';
 import FoodCard from './FoodCard';
@@ -22,6 +23,8 @@ function UserDashboard() {
   const [updatedShopList, setUpdatedShopList] = useState([]) // New State for filtered shops
   const [selectedCategory, setSelectedCategory] = useState("All") // New State for selected category
   const [isTransitioning, setIsTransitioning] = useState(false) // State for smooth transitions
+
+  const [isCityModalOpen, setIsCityModalOpen] = useState(!currentCity)
 
   const handleFilterByCategory = (category) => {
     if (category === selectedCategory) return; // Avoid re-triggering current category
@@ -65,6 +68,9 @@ function UserDashboard() {
     setUpdatedShopList(shopInMyCity)
   }, [itemsInMyCity, shopInMyCity])
 
+  useEffect(() => {
+    if (!currentCity) setIsCityModalOpen(true)
+  }, [currentCity])
 
   const updateButton = (ref, setLeftButton, setRightButton) => {
     const element = ref.current
@@ -110,7 +116,8 @@ function UserDashboard() {
 
   return (
     <div className='w-full min-h-screen flex flex-col items-center bg-[#fff9f6] text-gray-800 pb-20'>
-      <Nav />
+      <Nav onCityClick={() => setIsCityModalOpen(true)} />
+      <CitySelectorModal isOpen={isCityModalOpen} onClose={() => setIsCityModalOpen(false)} />
 
       {/* Promo Carousel */}
       <PromoCarousel />
