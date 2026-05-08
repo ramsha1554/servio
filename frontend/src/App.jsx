@@ -56,9 +56,12 @@ function App() {
         <Route path='/signin' element={!userData ? <SignIn /> : <Navigate to={"/"} />} />
         <Route path='/forgot-password' element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />} />
         <Route path='/' element={userData ? <Home /> : <Navigate to={"/signin"} />} />
-        <Route path='/create-edit-shop' element={userData ? <CreateEditShop /> : <Navigate to={"/signin"} />} />
-        <Route path='/add-item' element={userData ? <AddItem /> : <Navigate to={"/signin"} />} />
-        <Route path='/edit-item/:itemId' element={userData ? <EditItem /> : <Navigate to={"/signin"} />} />
+        
+        {/* Owner Routes */}
+        <Route path='/create-edit-shop' element={userData?.role === 'owner' ? <CreateEditShop /> : <Navigate to={"/"} />} />
+        <Route path='/add-item' element={userData?.role === 'owner' ? <AddItem /> : <Navigate to={"/"} />} />
+        <Route path='/edit-item/:itemId' element={userData?.role === 'owner' ? <EditItem /> : <Navigate to={"/"} />} />
+        
         <Route path='/cart' element={userData ? <CartPage /> : <Navigate to={"/signin"} />} />
         <Route path='/checkout' element={userData ? <CheckOut /> : <Navigate to={"/signin"} />} />
         <Route path='/order-placed' element={userData ? <OrderPlaced /> : <Navigate to={"/signin"} />} />
