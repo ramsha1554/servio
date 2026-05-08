@@ -10,7 +10,7 @@ const userSlice = createSlice({
     currentAddress: null,
     shopInMyCity: null,
     itemsInMyCity: null,
-    cartItems: [],
+    cartItems: JSON.parse(localStorage.getItem("servio_cart")) || [],
     totalAmount: 0,
     myOrders: [],
     searchItems: null,
@@ -47,7 +47,7 @@ const userSlice = createSlice({
       }
 
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
+      localStorage.setItem("servio_cart", JSON.stringify(state.cartItems))
     },
 
     setTotalAmount: (state, action) => {
@@ -63,11 +63,13 @@ const userSlice = createSlice({
         item.quantity = quantity
       }
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+      localStorage.setItem("servio_cart", JSON.stringify(state.cartItems))
     },
 
     removeCartItem: (state, action) => {
       state.cartItems = state.cartItems.filter(i => i.id !== action.payload)
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+      localStorage.setItem("servio_cart", JSON.stringify(state.cartItems))
     },
 
     setMyOrders: (state, action) => {
