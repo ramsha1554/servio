@@ -60,7 +60,8 @@ const userSlice = createSlice({
       const { id, quantity } = action.payload
       const item = state.cartItems.find(i => i.id == id)
       if (item) {
-        item.quantity = quantity
+        // Enforce 1 <= quantity <= 20
+        item.quantity = Math.max(1, Math.min(20, quantity))
       }
       state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
       localStorage.setItem("servio_cart", JSON.stringify(state.cartItems))

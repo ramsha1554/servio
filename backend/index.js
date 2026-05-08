@@ -42,7 +42,12 @@ app.use(cors({
     credentials: true
 }))
 
-app.use(helmet())
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader('X-Frame-Options', 'DENY')
+    res.setHeader('X-XSS-Protection', '1; mode=block')
+    next()
+})
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,

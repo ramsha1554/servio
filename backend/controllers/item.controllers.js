@@ -186,7 +186,7 @@ export const getItemsByShop = async (req, res) => {
         const { shopId } = req.params
         const shop = await Shop.findById(shopId).populate("items")
         if (!shop) {
-            return res.status(400).json("shop not found")
+            return res.status(400).json({ message: "shop not found" })
         }
         return res.status(200).json({
             shop, items: shop.items

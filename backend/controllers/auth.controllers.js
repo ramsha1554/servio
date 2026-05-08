@@ -34,7 +34,7 @@ export const signUp = async (req, res) => {
         return res.status(201).json(safeUser)
 
     } catch (error) {
-        return res.status(500).json(`sign up error ${error}`)
+        return res.status(500).json({ message: `sign up error ${error}` })
     }
 }
 
@@ -67,7 +67,7 @@ export const signIn = async (req, res) => {
         return res.status(200).json(safeUser)
 
     } catch (error) {
-        return res.status(500).json(`sign In error ${error}`)
+        return res.status(500).json({ message: `sign In error ${error}` })
     }
 }
 
@@ -80,7 +80,7 @@ export const signOut = async (req, res) => {
         })
         return res.status(200).json({ message: "log out successfully" })
     } catch (error) {
-        return res.status(500).json(`sign out error ${error}`)
+        return res.status(500).json({ message: `sign out error ${error}` })
     }
 }
 
@@ -104,7 +104,7 @@ export const sendOtp = async (req, res) => {
 
         return res.status(200).json({ message: "otp sent successfully" })
     } catch (error) {
-        return res.status(500).json(`send otp error ${error}`)
+        return res.status(500).json({ message: `send otp error ${error}` })
     }
 }
 
@@ -132,7 +132,7 @@ export const verifyOtp = async (req, res) => {
 
         return res.status(200).json({ message: "otp verify successfully" })
     } catch (error) {
-        return res.status(500).json(`verify otp error ${error}`)
+        return res.status(500).json({ message: `verify otp error ${error}` })
     }
 }
 
@@ -149,7 +149,7 @@ export const resetPassword = async (req, res) => {
         await user.save()
         return res.status(200).json({ message: "password reset successfully" })
     } catch (error) {
-        return res.status(500).json(`reset password error ${error}`)
+        return res.status(500).json({ message: `reset password error ${error}` })
     }
 }
 
@@ -179,6 +179,6 @@ export const googleAuth = async (req, res) => {
 
 
     } catch (error) {
-        return res.status(500).json(`googleAuth error ${error}`)
+        return res.status(500).json({ message: `googleAuth error ${error}` })
     }
 }

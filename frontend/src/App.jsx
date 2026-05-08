@@ -23,6 +23,7 @@ const MyOrders = lazy(() => import('./pages/MyOrders'))
 const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage'))
 const Shop = lazy(() => import('./pages/Shop'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 import { API_URL } from './config'
 
@@ -73,7 +74,7 @@ function App() {
         <Route path='/admin/*' element={userData?.role === 'admin' ? <AdminDashboard /> : <Navigate to={"/"} />} />
         
         {/* Catch-All 404 Route */}
-        <Route path='*' element={<Navigate to="/" replace />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </Suspense>
   )

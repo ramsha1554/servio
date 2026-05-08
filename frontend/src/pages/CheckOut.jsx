@@ -35,6 +35,7 @@ function CheckOut() {
   const [discountLabel, setDiscountLabel] = useState("")
   const [couponMsg, setCouponMsg] = useState("")
   const [deliveryDiscount, setDeliveryDiscount] = useState(false) // For Free Delivery
+  const [isPlacing, setIsPlacing] = useState(false)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -118,6 +119,8 @@ function CheckOut() {
   }
 
   const handlePlaceOrder = async () => {
+    if (isPlacing) return;
+    setIsPlacing(true)
     try {
       const orderPayload = {
         paymentMethod,
@@ -145,6 +148,8 @@ function CheckOut() {
       }
 
     } catch (error) {
+    } finally {
+      setIsPlacing(false)
     }
   }
 
@@ -333,10 +338,11 @@ function CheckOut() {
         </section>
 
         <button
-          className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-[#ff4d2d]/30 transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-300'
+          className={`w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg transform transition-all duration-300 ${isPlacing ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff4d2d] hover:bg-[#e64526] hover:shadow-[#ff4d2d]/30 hover:scale-[1.01] active:scale-[0.99]"}`}
           onClick={handlePlaceOrder}
+          disabled={isPlacing}
         >
-          {paymentMethod == "cod" ? "Place Order Now" : "Pay & Place Order"}
+          {isPlacing ? "Placing Order..." : "Place Order"}
         </button>
 
       </div>

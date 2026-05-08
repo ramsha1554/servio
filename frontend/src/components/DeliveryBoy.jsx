@@ -84,11 +84,13 @@ function DeliveryBoy() {
           const longitude = position.coords.longitude
           setDeliveryBoyLocation({ lat: latitude, lon: longitude })
           getAddress(latitude, longitude)
-          socket.emit('updateLocation', {
-            latitude,
-            longitude,
-            userId: userData._id
-          })
+          if (socket) {
+            socket.emit('updateLocation', {
+              latitude,
+              longitude,
+              userId: userData._id
+            })
+          }
         },
         (error) => {
           console.error("Location error:", error)
