@@ -50,5 +50,7 @@ const itemSchema = new mongoose.Schema({
    }
 }, { timestamps: true })
 
+itemSchema.index({ shop: 1 })
+
 const Item=mongoose.model("Item",itemSchema)
 export default Item

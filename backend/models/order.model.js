@@ -96,6 +96,7 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 orderSchema.index({ location: "2dsphere" })
+orderSchema.index({ user: 1 })
 
 const Order = mongoose.model("Order", orderSchema)
 export default Order

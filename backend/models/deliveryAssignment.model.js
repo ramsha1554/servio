@@ -33,5 +33,7 @@ const deliveryAssignmentSchema = new mongoose.Schema({
     acceptedAt:Date
 }, { timestamps: true })
 
+deliveryAssignmentSchema.index({ assignedTo: 1, status: 1 })
+
 const DeliveryAssignment=mongoose.model("DeliveryAssignment",deliveryAssignmentSchema)
 export default DeliveryAssignment
