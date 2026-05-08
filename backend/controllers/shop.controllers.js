@@ -1,6 +1,7 @@
 import Shop from "../models/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import redis from "../config/redis.js";
+import logger from "../config/logger.js";
 
 export const createEditShop = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ export const createEditShop = async (req, res) => {
         
         let image;
         if (req.file) {
-            console.log("Uploading file to Cloudinary:", req.file.path);
+            logger.info("Uploading file to Cloudinary", { path: req.file.path });
             image = await uploadOnCloudinary(req.file.path)
             if (!image) {
                 return res.status(500).json({ message: "Image upload failed. Please check Cloudinary configuration." })
@@ -42,12 +43,12 @@ export const createEditShop = async (req, res) => {
             if (city) await redis.del(`shops:${city}`);
             if (oldCity && oldCity !== city) await redis.del(`shops:${oldCity}`);
         } catch (redisError) {
-            console.error("Redis cache invalidation error:", redisError);
+            logger.error("Redis cache invalidation error", { error: redisError.message });
         }
 
         return res.status(201).json(shop)
     } catch (error) {
-        console.error("createEditShop Error:", error);
+        logger.error("createEditShop Error", { error: error.message });
         return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }
@@ -63,7 +64,7 @@ export const getMyShop = async (req, res) => {
         }
         return res.status(200).json(shop)
     } catch (error) {
-        console.error("getMyShop Error:", error);
+        logger.error("getMyShop Error", { error: error.message });
         return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }
@@ -78,7 +79,7 @@ export const getShopByCity = async (req, res) => {
                 return res.status(200).json(JSON.parse(cachedShops));
             }
         } catch (redisError) {
-            console.error("Redis get error:", redisError);
+            logger.error("Redis get error", { error: redisError.message });
         }
 
         const shops = await Shop.find({
@@ -92,12 +93,12 @@ export const getShopByCity = async (req, res) => {
         try {
             await redis.set(`shops:${city}`, JSON.stringify(shops), "EX", 300);
         } catch (redisError) {
-            console.error("Redis set error:", redisError);
+            logger.error("Redis set error", { error: redisError.message });
         }
 
         return res.status(200).json(shops)
     } catch (error) {
-        console.error("getShopByCity Error:", error);
+        logger.error("getShopByCity Error", { error: error.message });
         return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }

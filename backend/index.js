@@ -22,9 +22,11 @@ import logger from "./config/logger.js"
 const app = express()
 const server = http.createServer(app)
 
+const allowedOrigin = process.env.CLIENT_URL || (process.env.NODE_ENV === "production" ? undefined : "http://localhost:5173")
+
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        origin: allowedOrigin,
         credentials: true,
         methods: ['POST', 'GET']
     }
@@ -36,25 +38,31 @@ app.set("io", io)
 
 const port = process.env.PORT || 5000
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: allowedOrigin,
     credentials: true
 }))
 
 app.use(helmet())
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    windowMs: 15 * 60 * 1000,
+    max: 500,
+    standardHeaders: true,
+    legacyHeaders: false,
 })
 
-// Apply the rate limiting middleware to all requests
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+})
+
 app.use(limiter)
 
 app.use(express.json())
 app.use(cookieParser())
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authLimiter, authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/shop", shopRouter)
 app.use("/api/item", itemRouter)

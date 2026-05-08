@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary'
 import fs from "fs"
+import logger from "../config/logger.js"
 const uploadOnCloudinary = async (file) => {
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -12,7 +13,7 @@ const uploadOnCloudinary = async (file) => {
         return result.secure_url
     } catch (error) {
         fs.unlinkSync(file)
-        console.log(error)
+        logger.error("cloudinary upload error", { error: error.message })
     }
 }
 

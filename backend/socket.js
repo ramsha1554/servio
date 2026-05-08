@@ -1,8 +1,9 @@
 import User from "./models/user.model.js"
+import logger from "./config/logger.js"
 
 export const socketHandler = (io) => {
   io.on('connection', (socket) => {
-    console.log(socket.id)
+    logger.info("Socket connected", { id: socket.id })
     socket.on('identity', async ({ userId, role }) => {
       try {
         const user = await User.findByIdAndUpdate(userId, {
@@ -12,7 +13,7 @@ export const socketHandler = (io) => {
           socket.join('admin_room');
         }
       } catch (error) {
-        console.log(error)
+        logger.error("identity error", { error: error.message })
       }
     })
 
@@ -38,7 +39,7 @@ export const socketHandler = (io) => {
 
 
       } catch (error) {
-          console.log('updateDeliveryLocation error')
+          logger.error("updateDeliveryLocation error", { error: error.message })
       }
     })
 
@@ -53,7 +54,7 @@ export const socketHandler = (io) => {
           isOnline: false
         })
       } catch (error) {
-        console.log(error)
+        logger.error("disconnect error", { error: error.message })
       }
 
     })

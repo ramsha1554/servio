@@ -16,8 +16,8 @@ import { serverUrl } from '../App';
 import { addMyOrder, setTotalAmount } from '../redux/userSlice';
 
 function RecenterMap({ location }) {
+  const map = useMap()
   if (location.lat && location.lon) {
-    const map = useMap()
     map.setView([location.lat, location.lon], 16, { animate: true })
   }
   return null
@@ -105,7 +105,6 @@ function CheckOut() {
       const result = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${apiKey}`)
       dispatch(setAddress(result?.data?.results[0].address_line2))
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -115,7 +114,6 @@ function CheckOut() {
       const { lat, lon } = result.data.features[0].properties
       dispatch(setLocation({ lat, lon }))
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -147,7 +145,6 @@ function CheckOut() {
       }
 
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -168,7 +165,6 @@ function CheckOut() {
           dispatch(addMyOrder(result.data))
           navigate("/order-placed")
         } catch (error) {
-          console.log(error)
         }
       }
     }

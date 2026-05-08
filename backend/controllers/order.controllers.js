@@ -5,7 +5,8 @@ import User from "../models/user.model.js"
 import { emailQueue } from "../config/queue.js"
 import RazorPay from "razorpay"
 import dotenv from "dotenv"
-import { count } from "console"
+import crypto from "crypto"
+import logger from "../config/logger.js"
 
 dotenv.config()
 let instance = new RazorPay({
@@ -31,7 +32,7 @@ export const placeOrder = async (req, res) => {
         const shopOrders = await Promise.all(Object.keys(groupItemsByShop).map(async (shopId) => {
             const shop = await Shop.findById(shopId).populate("owner")
             if (!shop) {
-                return res.status(400).json({ message: "shop not found" })
+                throw new Error(`Shop not found: ${shopId}`)
             }
             const items = groupItemsByShop[shopId]
             const subtotal = items.reduce((sum, i) => sum + Number(i.price) * Number(i.quantity), 0)
@@ -46,8 +47,7 @@ export const placeOrder = async (req, res) => {
                     name: i.name
                 }))
             }
-        }
-        ))
+        }))
 
         if (paymentMethod == "online") {
             const razorOrder = await instance.orders.create({
@@ -118,6 +118,10 @@ export const placeOrder = async (req, res) => {
 
         return res.status(201).json(newOrder)
     } catch (error) {
+        if (error.message?.startsWith("Shop not found")) {
+            return res.status(400).json({ message: error.message })
+        }
+        logger.error("placeOrder error", { error: error.message })
         return res.status(500).json({ message: `place order error ${error}` })
     }
 }
@@ -347,15 +351,15 @@ export const updateOrderStatus = async (req, res) => {
 
 export const getDeliveryBoyAssignment = async (req, res) => {
     try {
-        console.log("=== getAssignments Start ===");
-        console.log("req.query:", req.query);
+        logger.info("=== getAssignments Start ===");
+        logger.info("req.query:", { query: req.query });
         const deliveryBoyId = req.userId
         let { latitude, longitude } = req.query
 
         // Default to DB location if not provided in query
         if (!latitude || !longitude) {
             const deliveryBoy = await User.findById(deliveryBoyId)
-            console.log("deliveryBoy fetched:", deliveryBoy ? deliveryBoy.email : "not found", deliveryBoy?.location);
+            logger.info("deliveryBoy fetched", { email: deliveryBoy?.email, location: deliveryBoy?.location });
             if (deliveryBoy && deliveryBoy.location && deliveryBoy.location.coordinates[0] !== 0) {
                 longitude = deliveryBoy.location.coordinates[0]
                 latitude = deliveryBoy.location.coordinates[1]
@@ -383,7 +387,7 @@ export const getDeliveryBoyAssignment = async (req, res) => {
         const lon1 = Number(longitude)
         const lat1 = Number(latitude)
 
-        console.log("Querying orders with lon1:", lon1, "lat1:", lat1);
+        logger.info("Querying orders", { lon1, lat1 });
         const geoQuery = {
             location: {
                 $near: {
@@ -395,7 +399,7 @@ export const getDeliveryBoyAssignment = async (req, res) => {
                 }
             }
         };
-        console.log("MongoDB Query:", JSON.stringify(geoQuery, null, 2));
+        logger.info("MongoDB Query", { geoQuery });
 
         // 1. Find Orders near the delivery boy (5km radius)
         // Using MongoDB geospatial query which is much faster than JS filtering
@@ -427,8 +431,7 @@ export const getDeliveryBoyAssignment = async (req, res) => {
 
         return res.status(200).json({ success: true, assignments: formated })
     } catch (error) {
-        console.error("=== getAssignments Error ===");
-        console.error(error);
+        logger.error("getAssignments Error", { error: error.message });
         return res.status(500).json({ success: false, message: `get Assignment error: ${error.message}` })
     }
 }
@@ -528,7 +531,7 @@ export const getCurrentOrder = async (req, res) => {
         })
 
     } catch (error) {
-        console.error("getCurrentOrder error:", error)
+        logger.error("getCurrentOrder error", { error: error.message })
         return res.status(500).json({ 
             success: false, 
             message: "getCurrentOrder error " + error.message 
@@ -572,7 +575,7 @@ export const sendDeliveryOtp = async (req, res) => {
         if (!order || !shopOrder) {
             return res.status(400).json({ message: "enter valid order/shopOrderid" })
         }
-        const otp = "1234" // Fixed for testing
+        const otp = crypto.randomInt(1000, 9999).toString()
         shopOrder.deliveryOtp = otp
         shopOrder.otpExpires = Date.now() + 5 * 60 * 1000
         await order.save()

@@ -3,6 +3,7 @@ import bcrypt, { hash } from "bcryptjs"
 import genToken from "../utils/token.js"
 import redis from "../config/redis.js"
 import { emailQueue } from "../config/queue.js"
+import logger from "../config/logger.js"
 export const signUp = async (req, res) => {
     try {
         const { fullName, email, password, mobile, role } = req.body
@@ -29,7 +30,8 @@ export const signUp = async (req, res) => {
             httpOnly: true
         })
 
-        return res.status(201).json(user)
+        const safeUser = await User.findById(user._id).select("-password")
+        return res.status(201).json(safeUser)
 
     } catch (error) {
         return res.status(500).json(`sign up error ${error}`)
@@ -61,7 +63,8 @@ export const signIn = async (req, res) => {
             httpOnly: true
         })
 
-        return res.status(200).json(user)
+        const safeUser = await User.findById(user._id).select("-password")
+        return res.status(200).json(safeUser)
 
     } catch (error) {
         return res.status(500).json(`sign In error ${error}`)
@@ -171,7 +174,8 @@ export const googleAuth = async (req, res) => {
             httpOnly: true
         })
 
-        return res.status(200).json(user)
+        const safeUser = await User.findById(user._id).select("-password")
+        return res.status(200).json(safeUser)
 
 
     } catch (error) {

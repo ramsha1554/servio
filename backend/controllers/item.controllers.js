@@ -2,6 +2,7 @@ import Item from "../models/item.model.js";
 import Shop from "../models/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import redis from "../config/redis.js";
+import logger from "../config/logger.js";
 
 export const addItem = async (req, res) => {
     try {
@@ -41,13 +42,13 @@ export const addItem = async (req, res) => {
                 await redis.del(`items:city:${shop.city}`);
             }
         } catch (redisError) {
-            console.error("Redis error:", redisError);
+            logger.error("Redis error", { error: redisError.message });
         }
 
         return res.status(201).json(shop)
 
     } catch (error) {
-        console.error("addItem Error:", error);
+        logger.error("addItem Error", { error: error.message });
         return res.status(500).json({ message: error.message || "Internal Server Error" })
     }
 }
@@ -85,13 +86,13 @@ export const editItem = async (req, res) => {
                 await redis.del(`items:city:${shop.city}`);
             }
         } catch (redisError) {
-            console.error("Redis error:", redisError);
+            logger.error("Redis error", { error: redisError.message });
         }
 
         return res.status(200).json(shop)
 
     } catch (error) {
-        console.error("editItem Error:", error);
+        logger.error("editItem Error", { error: error.message });
         return res.status(500).json({ message: error.message || "Internal Server Error" })
     }
 }
@@ -117,7 +118,7 @@ export const deleteItem = async (req, res) => {
             return res.status(400).json({ message: "item not found" })
         }
         const shop = await Shop.findOne({ owner: req.userId })
-        shop.items = shop.items.filter(i => i !== item._id)
+        shop.items = shop.items.filter(i => !i.equals(item._id))
         await shop.save()
         await shop.populate({
             path: "items",
@@ -150,7 +151,7 @@ export const getItemByCity = async (req, res) => {
                 return res.status(200).json(JSON.parse(cachedItems));
             }
         } catch (redisError) {
-            console.error("Redis get error:", redisError);
+            logger.error("Redis get error", { error: redisError.message });
         }
 
         const shops = await Shop.find({
@@ -169,13 +170,13 @@ export const getItemByCity = async (req, res) => {
         try {
             await redis.set(`items:city:${city}`, JSON.stringify(items), "EX", 300);
         } catch (redisError) {
-            console.error("Redis set error:", redisError);
+            logger.error("Redis set error", { error: redisError.message });
         }
 
         return res.status(200).json(items)
 
     } catch (error) {
-        console.error("getItemByCity Error:", error);
+        logger.error("getItemByCity Error", { error: error.message });
         return res.status(500).json({ message: error.message || "Internal server error" })
     }
 }
@@ -199,7 +200,7 @@ export const searchItems = async (req, res) => {
     try {
         const { query, city } = req.query
         if (!query || !city) {
-            return null
+            return res.status(400).json({ message: "query and city are required" })
         }
         const shops = await Shop.find({
             city: { $regex: new RegExp(`^${city}$`, "i") }

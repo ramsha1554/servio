@@ -130,7 +130,6 @@ function DeliveryBoy() {
         setErrorMsg(result.data.message || "Could not load assignments. Please try again.")
       }
     } catch (error) {
-      console.error("getAssignments error:", error.response?.data || error)
       setErrorMsg("Could not load assignments. Please try again.")
     }
   }
@@ -140,7 +139,6 @@ function DeliveryBoy() {
       const result = await axios.get(`${serverUrl}/api/order/get-current-order`, { withCredentials: true })
       setCurrentOrder(result.data)
     } catch (error) {
-      console.log("Error fetching current order:", error.response?.data || error.message)
     }
   }
 
@@ -148,14 +146,13 @@ function DeliveryBoy() {
   const acceptOrder = async (assignmentId) => {
     try {
       const result = await axios.get(`${serverUrl}/api/order/accept-order/${assignmentId}`, { withCredentials: true })
-      console.log(result.data)
       await getCurrentOrder()
     } catch (error) {
-      console.log(error)
     }
   }
 
   useEffect(() => {
+    if (!socket) return;
     socket.on('newAssignment', (data) => {
       setAvailableAssignments(prev => ([...prev, data]))
     })
@@ -172,9 +169,7 @@ function DeliveryBoy() {
       }, { withCredentials: true })
       setLoading(false)
       setShowOtpBox(true)
-      console.log(result.data)
     } catch (error) {
-      console.log(error)
       setLoading(false)
     }
   }
@@ -184,11 +179,9 @@ function DeliveryBoy() {
       const result = await axios.post(`${serverUrl}/api/order/verify-delivery-otp`, {
         orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id, otp
       }, { withCredentials: true })
-      console.log(result.data)
       setMessage(result.data.message)
       location.reload()
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -197,10 +190,8 @@ function DeliveryBoy() {
 
     try {
       const result = await axios.get(`${serverUrl}/api/order/get-today-deliveries`, { withCredentials: true })
-      console.log(result.data)
       setTodayDeliveries(result.data)
     } catch (error) {
-      console.log(error)
     }
   }
 
