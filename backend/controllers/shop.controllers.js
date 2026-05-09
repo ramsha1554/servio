@@ -25,11 +25,26 @@ export const createEditShop = async (req, res) => {
             if (!image) {
                 return res.status(400).json({ message: "A shop image is strictly required when creating a new shop." })
             }
-            shop = await Shop.create({
-                name, city, state, address, image, owner: finalOwnerId, categories: req.body.categories, location: req.body.location
-            })
+            const shopData = {
+                name, city, state, address, image, owner: finalOwnerId, categories: req.body.categories
+            }
+
+            if (req.body.location && (!req.body.location.coordinates || req.body.location.coordinates.length !== 2)) {
+                delete req.body.location;
+            } else if (req.body.location) {
+                shopData.location = req.body.location;
+            }
+
+            shop = await Shop.create(shopData)
         } else {
-            const updateData = { name, city, state, address, owner: finalOwnerId, categories: req.body.categories, location: req.body.location }
+            const updateData = { name, city, state, address, owner: finalOwnerId, categories: req.body.categories }
+            
+            if (req.body.location && (!req.body.location.coordinates || req.body.location.coordinates.length !== 2)) {
+                delete req.body.location;
+            } else if (req.body.location) {
+                updateData.location = req.body.location;
+            }
+
             if (image) {
                 updateData.image = image;
             }

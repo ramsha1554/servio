@@ -14,13 +14,22 @@ export const signUp = async (req, res) => {
         // Validation handled by Zod
 
         const hashedPassword = await bcrypt.hash(password, 10)
-        user = await User.create({
+        
+        const userData = {
             fullName,
             email,
             role,
             mobile,
             password: hashedPassword
-        })
+        }
+
+        if (req.body.location && (!req.body.location.coordinates || req.body.location.coordinates.length !== 2)) {
+            delete req.body.location;
+        } else if (req.body.location) {
+            userData.location = req.body.location;
+        }
+
+        user = await User.create(userData)
 
         const token = await genToken(user._id)
         res.cookie("token", token, {
