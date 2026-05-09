@@ -40,18 +40,28 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-   location:{
-type:{type:String,enum:['Point'],default:'Point'},
-coordinates:{type:[Number]}
-   },
-   isBanned:{
-        type:Boolean,
-        default:false
-   }
-  
+    location: {
+        type: { type: String, enum: ['Point'], default: 'Point' },
+        coordinates: { type: [Number], default: [0, 0] }
+    },
+    isBanned: {
+        type: Boolean,
+        default: false
+    }
+
 }, { timestamps: true })
 
-userSchema.index({location:'2dsphere'})
+userSchema.pre('save', function (next) {
+    if (!this.location) {
+        this.location = { type: 'Point', coordinates: [0, 0] };
+    }
+    if (!this.location.coordinates || this.location.coordinates.length !== 2) {
+        this.location.coordinates = [0, 0];
+    }
+    next();
+});
+
+userSchema.index({ location: '2dsphere' })
 
 
 const User=mongoose.model("User",userSchema)
