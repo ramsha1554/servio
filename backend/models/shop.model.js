@@ -35,7 +35,7 @@ const shopSchema = new mongoose.Schema({
     }],
     location: {
         type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number] }
+        coordinates: { type: [Number], default: [0, 0] }
     },
     isVerified: {
         type: Boolean,
@@ -43,6 +43,16 @@ const shopSchema = new mongoose.Schema({
     }
 
 }, { timestamps: true })
+
+shopSchema.pre('save', function (next) {
+    if (!this.location) {
+        this.location = { type: 'Point', coordinates: [0, 0] };
+    }
+    if (!this.location.coordinates || this.location.coordinates.length !== 2) {
+        this.location.coordinates = [0, 0];
+    }
+    next();
+});
 
 shopSchema.index({ location: '2dsphere' })
 
