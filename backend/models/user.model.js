@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
     },
     location: {
         type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] }
+        coordinates: { type: [Number], default: undefined }
     },
     isBanned: {
         type: Boolean,
@@ -51,17 +51,7 @@ const userSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-userSchema.pre('save', function (next) {
-    if (!this.location) {
-        this.location = { type: 'Point', coordinates: [0, 0] };
-    }
-    if (!this.location.coordinates || this.location.coordinates.length !== 2) {
-        this.location.coordinates = [0, 0];
-    }
-    next();
-});
-
-userSchema.index({ location: '2dsphere' })
+userSchema.index({ location: '2dsphere' }, { sparse: true })
 
 
 const User=mongoose.model("User",userSchema)
