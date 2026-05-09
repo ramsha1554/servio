@@ -22,7 +22,7 @@ import logger from "./config/logger.js"
 const app = express()
 const server = http.createServer(app)
 
-const allowedOrigin = process.env.CLIENT_URL || (process.env.NODE_ENV === "production" ? undefined : "http://localhost:5173")
+const allowedOrigin = process.env.CLIENT_URL || "http://localhost:5173"
 
 const io = new Server(server, {
     cors: {
