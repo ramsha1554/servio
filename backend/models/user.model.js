@@ -44,11 +44,11 @@ const userSchema = new mongoose.Schema({
         type: {
             type: String,
             enum: ['Point'],
-            required: false
+            default: undefined
         },
         coordinates: {
             type: [Number],
-            required: false
+            default: undefined
         }
     },
     deviceToken: {
@@ -70,7 +70,6 @@ const userSchema = new mongoose.Schema({
 
 // Use a sparse index so documents without location are not indexed
 userSchema.index({ location: "2dsphere" }, { sparse: true });
-userSchema.index({ "location.coordinates": "2dsphere" }, { sparse: true });
 
 
 const User=mongoose.model("User",userSchema)
