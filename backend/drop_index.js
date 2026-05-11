@@ -4,7 +4,7 @@ dotenv.config();
 
 const dropIndex = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGODB_URL);
         console.log("Connected to MongoDB");
 
         const collection = mongoose.connection.collection('users');
