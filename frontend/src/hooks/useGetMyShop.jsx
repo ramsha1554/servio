@@ -18,7 +18,7 @@ function useGetMyshop() {
     queryKey: ['myShop', userData?._id],
     queryFn: fetchMyShop,
     // Only fetch if user is logged in AND is an owner otherwise return null
-    enabled: !!userData && userData.role === 'owner',
+    enabled: !!userData?.role && userData.role === 'owner',
     staleTime: 0,
   })
 
