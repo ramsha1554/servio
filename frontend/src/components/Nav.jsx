@@ -51,7 +51,7 @@ function Nav({ onCityClick }) {
     return (
         <div className='w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] border-b border-gray-100 overflow-visible transition-all duration-300'>
 
-            {showSearch && userData.role == "user" && <div className='w-[90%] h-[70px] bg-white shadow-2xl rounded-2xl items-center gap-[20px] flex fixed top-[80px] left-[5%] md:hidden border border-gray-100 z-50 animate-fade-in-up'>
+            {showSearch && userData?.role == "user" && <div className='w-[90%] h-[70px] bg-white shadow-2xl rounded-2xl items-center gap-[20px] flex fixed top-[80px] left-[5%] md:hidden border border-gray-100 z-50 animate-fade-in-up'>
                 <div 
                     className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors rounded-l-2xl'
                     onClick={onCityClick}
@@ -78,7 +78,7 @@ function Nav({ onCityClick }) {
                 Servio
             </h1>
 
-            {userData.role == "user" && <div className='md:w-[60%] lg:w-[40%] h-[55px] bg-white border border-gray-200 shadow-sm rounded-full items-center gap-[20px] hidden md:flex transition-all duration-300 hover:shadow-md focus-within:ring-2 focus-within:ring-[#ff4d2d]/20 focus-within:border-[#ff4d2d]'>
+            {userData?.role == "user" && <div className='md:w-[60%] lg:w-[40%] h-[55px] bg-white border border-gray-200 shadow-sm rounded-full items-center gap-[20px] hidden md:flex transition-all duration-300 hover:shadow-md focus-within:ring-2 focus-within:ring-[#ff4d2d]/20 focus-within:border-[#ff4d2d]'>
                 <div 
                     className='flex items-center w-[30%] overflow-hidden gap-[10px] pl-[20px] pr-[10px] border-r-[2px] border-gray-100 h-[60%] cursor-pointer hover:bg-gray-50 transition-colors rounded-l-full'
                     onClick={onCityClick}
@@ -99,9 +99,9 @@ function Nav({ onCityClick }) {
             </div>}
 
             <div className='flex items-center gap-5'>
-                {userData.role == "user" && (showSearch ? <RxCross2 size={25} className='text-[#ff4d2d] md:hidden cursor-pointer' onClick={() => setShowSearch(false)} /> : <IoIosSearch size={25} className='text-[#ff4d2d] md:hidden cursor-pointer' onClick={() => setShowSearch(true)} />)
+                {userData?.role == "user" && (showSearch ? <RxCross2 size={25} className='text-[#ff4d2d] md:hidden cursor-pointer' onClick={() => setShowSearch(false)} /> : <IoIosSearch size={25} className='text-[#ff4d2d] md:hidden cursor-pointer' onClick={() => setShowSearch(true)} />)
                 }
-                {userData.role == "owner" ? <>
+                {userData?.role == "owner" ? <>
                     {myShopData && <> <button className='hidden md:flex items-center gap-2 p-2 px-4 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d] hover:bg-[#ff4d2d] hover:text-white transition-all duration-300 font-medium' onClick={() => navigate("/add-item")}>
                         <FaPlus size={18} />
                         <span className="text-sm">Add Item</span>
@@ -119,7 +119,7 @@ function Nav({ onCityClick }) {
                     </div>
                 </> : (
                     <>
-                        {userData.role == "user" && <div className='relative cursor-pointer group' onClick={() => navigate("/cart")}>
+                        {userData?.role == "user" && <div className='relative cursor-pointer group' onClick={() => navigate("/cart")}>
                             <FiShoppingCart size={24} className='text-[#ff4d2d] transition-transform group-hover:scale-110 duration-200' />
                             {cartItems.length > 0 && <span className='absolute right-[-8px] top-[-8px] bg-[#ff4d2d] text-white text-[10px] font-bold w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm'>{cartItems.length}</span>}
                         </div>}
@@ -138,10 +138,10 @@ function Nav({ onCityClick }) {
                     {showInfo && <div className={`fixed top-[85px] right-[20px] w-[220px] bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] rounded-2xl p-2 flex flex-col gap-1 z-[9999] border border-gray-100 origin-top-right animate-fade-in-up`}>
                         <div className='px-4 py-3 border-b border-gray-100 mb-1'>
                             <p className='text-xs text-gray-400 font-medium uppercase tracking-wider'>Signed in as</p>
-                            <p className='font-bold text-gray-800 truncate'>{userData.fullName}</p>
+                            <p className='font-bold text-gray-800 truncate'>{userData?.fullName}</p>
                         </div>
 
-                        {userData.role == "user" && <div className='md:hidden px-4 py-2 hover:bg-gray-50 rounded-xl text-gray-600 cursor-pointer text-sm font-medium transition-colors' onClick={() => navigate("/my-orders")}>My Orders</div>}
+                        {userData?.role == "user" && <div className='md:hidden px-4 py-2 hover:bg-gray-50 rounded-xl text-gray-600 cursor-pointer text-sm font-medium transition-colors' onClick={() => navigate("/my-orders")}>My Orders</div>}
 
                         <div className='px-4 py-2 hover:bg-red-50 hover:text-red-500 text-red-500 rounded-xl font-medium cursor-pointer text-sm transition-colors' onClick={handleLogOut}>Sign Out</div>
                     </div>}
