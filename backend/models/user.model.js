@@ -41,9 +41,26 @@ const userSchema = new mongoose.Schema({
         default:false
     },
     location: {
-        type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number], default: undefined }
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: false
+        },
+        coordinates: {
+            type: [Number],
+            required: false
+        }
     },
+    deviceToken: {
+        type: String // For push notifications
+    },
+    addresses: [{
+        street: String,
+        city: String,
+        state: String,
+        zipCode: String,
+        isDefault: { type: Boolean, default: false }
+    }],
     isBanned: {
         type: Boolean,
         default: false
@@ -51,7 +68,9 @@ const userSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-userSchema.index({ location: '2dsphere' }, { sparse: true })
+// Use a sparse index so documents without location are not indexed
+userSchema.index({ location: "2dsphere" }, { sparse: true });
+userSchema.index({ "location.coordinates": "2dsphere" }, { sparse: true });
 
 
 const User=mongoose.model("User",userSchema)
