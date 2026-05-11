@@ -30,6 +30,7 @@ function SignIn() {
             dispatch(setUserData(result.data))
             setErr("")
             setLoading(false)
+            navigate("/")
         } catch (error) {
             setErr(error?.response?.data?.message)
             setLoading(false)
@@ -68,7 +69,10 @@ function SignIn() {
 
                 <div className='mb-2'>
                     <Input
+                        id="signin-email"
                         label="Email Address"
+                        name="email"
+                        autoComplete="email"
                         type="email"
                         placeholder="name@example.com"
                         value={email}
@@ -80,7 +84,10 @@ function SignIn() {
                 <div className='mb-6'>
                     <div className='relative'>
                         <Input
+                            id="signin-password"
                             label="Password"
+                            name="password"
+                            autoComplete="current-password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={password}

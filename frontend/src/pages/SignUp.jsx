@@ -84,8 +84,10 @@ function SignUp() {
                 </div>
 
                 <Input
+                    id="signup-name"
                     label="Full Name"
                     name="fullName"
+                    autoComplete="name"
                     placeholder="John Doe"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -93,8 +95,10 @@ function SignUp() {
                 />
 
                 <Input
+                    id="signup-email"
                     label="Email Address"
                     name="email"
+                    autoComplete="email"
                     type="email"
                     placeholder="name@example.com"
                     value={email}
@@ -103,8 +107,10 @@ function SignUp() {
                 />
 
                 <Input
+                    id="signup-mobile"
                     label="Mobile Number"
                     name="mobile"
+                    autoComplete="tel"
                     type="tel"
                     placeholder="1234567890"
                     value={mobile}
@@ -115,8 +121,10 @@ function SignUp() {
                 <div className='mb-5'>
                     <div className='relative'>
                         <Input
+                            id="signup-password"
                             label="Password"
                             name="password"
+                            autoComplete="new-password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={password}

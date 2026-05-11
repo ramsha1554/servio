@@ -38,7 +38,8 @@ const io = new Server(server, {
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-    }
+    },
+    allowEIO3: true
 });
 
 app.set("io", io);

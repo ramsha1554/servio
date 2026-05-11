@@ -14,7 +14,10 @@ export const SocketProvider = ({ children }) => {
     const { userData } = useSelector(state => state.user);
 
     useEffect(() => {
-        const socketInstance = io(serverUrl, { withCredentials: true });
+        const socketInstance = io(serverUrl, { 
+            withCredentials: true,
+            transports: ["websocket", "polling"]
+        });
         setSocket(socketInstance);
 
         socketInstance.on('connect', () => {

@@ -2,6 +2,8 @@ import React from 'react';
 
 const Input = ({
     label,
+    id,
+    autoComplete,
     error,
     icon: Icon,
     className = '',
@@ -11,7 +13,7 @@ const Input = ({
     return (
         <div className={`mb-4 ${containerClassName}`}>
             {label && (
-                <label className="block text-slate-700 font-semibold mb-2 text-sm ml-1">
+                <label htmlFor={id} className="block text-slate-700 font-semibold mb-2 text-sm ml-1">
                     {label}
                 </label>
             )}
@@ -22,6 +24,9 @@ const Input = ({
                     </div>
                 )}
                 <input
+                    id={id}
+                    name={props.name || id}
+                    autoComplete={autoComplete}
                     className={`
             w-full border-2 rounded-xl px-4 py-3 bg-gray-50 
             transition-all duration-300
