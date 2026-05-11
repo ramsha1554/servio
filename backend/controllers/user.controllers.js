@@ -16,22 +16,41 @@ export const getCurrentUser=async (req,res) => {
     }
 }
 
-export const updateUserLocation=async (req,res) => {
+export const updateUserLocation = async (req, res) => {
     try {
-        const {lat,lon}=req.body
-        const user=await User.findByIdAndUpdate(req.userId,{
-            location:{
-                type:'Point',
-                coordinates:[lon,lat]
-            }
-        },{new:true})
-         if(!user){
-               return res.status(400).json({message:"user is not found"})
+        const { latitude, longitude } = req.body;
+
+        if (!latitude || !longitude) {
+            return res.status(400).json({ success: false, message: "Latitude and longitude are required" });
         }
-        
-        return res.status(200).json({message:'location updated'})
+
+        // Validate coordinates (Lat: -90 to 90, Lng: -180 to 180)
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            return res.status(400).json({ success: false, message: "Invalid coordinates provided" });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            {
+                location: {
+                    type: "Point",
+                    coordinates: [parseFloat(longitude), parseFloat(latitude)]
+                }
+            },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Location updated successfully",
+            user
+        });
     } catch (error) {
-           return res.status(500).json({message:`update location user error ${error}`})
+        return res.status(500).json({ success: false, message: `Update location error: ${error.message}` });
     }
 }
 
