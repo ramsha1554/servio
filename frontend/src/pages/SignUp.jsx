@@ -42,6 +42,7 @@ function SignUp() {
             dispatch(setUserData(result.data))
             setErr("")
             setLoading(false)
+            navigate("/")
         } catch (error) {
             setErr(error?.response?.data?.message)
             setLoading(false)
@@ -84,6 +85,7 @@ function SignUp() {
 
                 <Input
                     label="Full Name"
+                    name="fullName"
                     placeholder="John Doe"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -92,6 +94,7 @@ function SignUp() {
 
                 <Input
                     label="Email Address"
+                    name="email"
                     type="email"
                     placeholder="name@example.com"
                     value={email}
@@ -101,6 +104,7 @@ function SignUp() {
 
                 <Input
                     label="Mobile Number"
+                    name="mobile"
                     type="tel"
                     placeholder="1234567890"
                     value={mobile}
@@ -112,6 +116,7 @@ function SignUp() {
                     <div className='relative'>
                         <Input
                             label="Password"
+                            name="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={password}

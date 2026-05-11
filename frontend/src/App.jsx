@@ -56,7 +56,7 @@ function App() {
         <Route path='/signup' element={!userData ? <SignUp /> : <Navigate to={"/"} />} />
         <Route path='/signin' element={!userData ? <SignIn /> : <Navigate to={"/"} />} />
         <Route path='/forgot-password' element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />} />
-        <Route path='/' element={userData ? <Home /> : <Navigate to={"/signin"} />} />
+        <Route path='/' element={<Home />} />
         
         {/* Owner Routes */}
         <Route path='/create-edit-shop' element={userData?.role === 'owner' ? <CreateEditShop /> : <Navigate to={"/"} />} />
