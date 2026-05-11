@@ -3,9 +3,8 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import { TbCurrentLocation } from "react-icons/tb";
 import { IoLocationSharp } from "react-icons/io5";
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
-import "leaflet/dist/leaflet.css"
+
 import { setAddress, setLocation } from '../redux/mapSlice';
 import { MdDeliveryDining } from "react-icons/md";
 import { FaCreditCard } from "react-icons/fa";
@@ -15,13 +14,9 @@ import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
 import { addMyOrder, setTotalAmount } from '../redux/userSlice';
 
-function RecenterMap({ location }) {
-  const map = useMap()
-  if (location.lat && location.lon) {
-    map.setView([location.lat, location.lon], 16, { animate: true })
-  }
-  return null
-}
+
+
+
 
 function CheckOut() {
   const { location, address } = useSelector(state => state.map)
@@ -205,21 +200,22 @@ function CheckOut() {
             <button className='bg-[#ff4d2d] hover:bg-[#e64526] text-white px-4 py-2 rounded-xl flex items-center justify-center transition-colors shadow-md hover:shadow-lg' onClick={getLatLngByAddress}><IoSearchOutline size={20} /></button>
             <button className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center transition-colors shadow-md hover:shadow-lg' onClick={getCurrentLocation}><TbCurrentLocation size={20} /></button>
           </div>
-          <div className='rounded-xl border border-gray-200 overflow-hidden shadow-inner'>
-            <div className='h-72 w-full flex items-center justify-center'>
-              <MapContainer
-                className={"w-full h-full"}
-                center={[location?.lat, location?.lon]}
-                zoom={16}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <RecenterMap location={location} />
-                <Marker position={[location?.lat, location?.lon]} draggable eventHandlers={{ dragend: onDragEnd }} />
-              </MapContainer>
-            </div>
+          <div className='rounded-xl border border-gray-200 overflow-hidden shadow-inner h-72'>
+            {location?.lat && location?.lon ? (
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://maps.google.com/maps?q=${location.lat},${location.lon}&z=16&output=embed`}
+              />
+            ) : (
+              <div className='h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50 gap-2'>
+                <IoLocationSharp size={32} className='text-gray-300' />
+                <p className='text-sm'>Search an address or use current location</p>
+              </div>
+            )}
           </div>
         </section>
 
