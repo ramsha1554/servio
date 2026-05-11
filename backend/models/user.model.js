@@ -44,11 +44,11 @@ const userSchema = new mongoose.Schema({
         type: {
             type: String,
             enum: ['Point'],
-            default: undefined
+            required: false
         },
         coordinates: {
             type: [Number],
-            default: undefined
+            required: false
         }
     },
     deviceToken: {
