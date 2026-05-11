@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+const pointSchema = new mongoose.Schema({
+    type: {
+        type: String,
+        enum: ['Point'],
+        required: true
+    },
+    coordinates: {
+        type: [Number],
+        required: true
+    }
+}, { _id: false });
+
 const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
@@ -41,15 +53,9 @@ const userSchema = new mongoose.Schema({
         default:false
     },
     location: {
-        type: {
-            type: String,
-            enum: ['Point'],
-            required: false
-        },
-        coordinates: {
-            type: [Number],
-            required: false
-        }
+        type: pointSchema,
+        index: '2dsphere',
+        default: undefined
     },
     deviceToken: {
         type: String // For push notifications
@@ -69,7 +75,8 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 // Use a sparse index so documents without location are not indexed
-userSchema.index({ location: "2dsphere" }, { sparse: true });
+// The index is now defined directly on the field above with the 'sparse' behavior handled by 'default: undefined'
+// userSchema.index({ location: "2dsphere" }, { sparse: true });
 
 
 const User=mongoose.model("User",userSchema)
