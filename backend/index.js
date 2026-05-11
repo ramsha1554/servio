@@ -23,25 +23,40 @@ const app = express()
 app.set('trust proxy', 1)
 const server = http.createServer(app)
 
-const allowedOrigin = process.env.CLIENT_URL || "http://localhost:5173"
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(",") 
+    : ["http://localhost:5173"];
 
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigin,
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         credentials: true,
-        methods: ['POST', 'GET']
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     }
-})
+});
 
-app.set("io", io)
+app.set("io", io);
 
+const port = process.env.PORT || 8000;
 
-
-const port = process.env.PORT || 5000
 app.use(cors({
-    origin: allowedOrigin,
-    credentials: true
-}))
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+}));
 
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff')
