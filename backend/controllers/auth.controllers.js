@@ -7,31 +7,25 @@ import logger from "../config/logger.js"
 export const signUp = async (req, res) => {
     try {
         const { fullName, email, password, mobile, role } = req.body
+        
         let user = await User.findOne({ email })
         if (user) {
-            return res.status(400).json({ message: "User Already exist." })
+            return res.status(400).json({ success: false, message: "User Already exist." })
         }
-        // Validation handled by Zod
 
         const hashedPassword = await bcrypt.hash(password, 10)
         
-        const userData = {
+        // Root Cause Fix: Explicitly omit location during signup
+        const user = await User.create({
             fullName,
             email,
             role,
             mobile,
             password: hashedPassword
-        }
-
-        if (req.body.location && (!req.body.location.coordinates || req.body.location.coordinates.length !== 2)) {
-            delete req.body.location;
-        } else if (req.body.location) {
-            userData.location = req.body.location;
-        }
-
-        user = await User.create(userData)
+        })
 
         const token = await genToken(user._id)
+        
         res.cookie("token", token, {
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
@@ -39,11 +33,18 @@ export const signUp = async (req, res) => {
             httpOnly: true
         })
 
-        const safeUser = await User.findById(user._id).select("-password")
-        return res.status(201).json(safeUser)
+        const safeUser = user.toObject();
+        delete safeUser.password;
+
+        return res.status(201).json({ 
+            success: true, 
+            message: "User created successfully", 
+            token, 
+            user: safeUser 
+        })
 
     } catch (error) {
-        return res.status(500).json({ message: `sign up error ${error}` })
+        return res.status(500).json({ success: false, message: `Signup error: ${error.message}` })
     }
 }
 
@@ -54,13 +55,23 @@ export const signIn = async (req, res) => {
         const user = await User.findOne({ email })
 
         if (!user) {
-            return res.status(400).json({ message: "User does not exist." })
+            return res.status(400).json({ success: false, message: "User does not exist." })
+        }
+
+        // Permanent Fix: Block banned users at login
+        if (user.isBanned) {
+            return res.status(403).json({ success: false, message: "Your account is banned. Contact support." })
+        }
+
+        // Handle Google users who might not have a password
+        if (!user.password && !password) {
+             return res.status(400).json({ success: false, message: "Please use Google Login for this account." })
         }
 
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (!isMatch) {
-            return res.status(400).json({ message: "incorrect Password" })
+            return res.status(400).json({ success: false, message: "Incorrect password" })
         }
 
         const token = await genToken(user._id)
@@ -72,11 +83,18 @@ export const signIn = async (req, res) => {
             httpOnly: true
         })
 
-        const safeUser = await User.findById(user._id).select("-password")
-        return res.status(200).json(safeUser)
+        const safeUser = user.toObject();
+        delete safeUser.password;
+
+        return res.status(200).json({ 
+            success: true, 
+            message: `Welcome back, ${user.fullName}`, 
+            token, 
+            user: safeUser 
+        })
 
     } catch (error) {
-        return res.status(500).json({ message: `sign In error ${error}` })
+        return res.status(500).json({ success: false, message: `Signin error: ${error.message}` })
     }
 }
 
@@ -166,13 +184,19 @@ export const googleAuth = async (req, res) => {
     try {
         const { fullName, email, mobile, role } = req.body
         let user = await User.findOne({ email })
+        
         if (!user) {
+            // Root Cause Fix: Omit location during creation
             user = await User.create({
-                fullName: fullName || "Google User", 
-                email, 
-                mobile: mobile || "Not Provided", 
+                fullName: fullName || "Google User",
+                email,
+                mobile: mobile || "Not Provided",
                 role: role || "user"
             })
+        }
+
+        if (user.isBanned) {
+            return res.status(403).json({ success: false, message: "Account banned." })
         }
 
         const token = await genToken(user._id)
@@ -183,11 +207,51 @@ export const googleAuth = async (req, res) => {
             httpOnly: true
         })
 
-        const safeUser = await User.findById(user._id).select("-password")
-        return res.status(200).json(safeUser)
+        const safeUser = user.toObject();
+        delete safeUser.password;
 
+        return res.status(200).json({ success: true, user: safeUser, token })
 
     } catch (error) {
-        return res.status(500).json({ message: `googleAuth error ${error}` })
+        return res.status(500).json({ success: false, message: `Google Auth error: ${error.message}` })
+    }
+}
+
+export const updateLocation = async (req, res) => {
+    try {
+        const { latitude, longitude } = req.body;
+
+        if (!latitude || !longitude) {
+            return res.status(400).json({ success: false, message: "Latitude and longitude are required" });
+        }
+
+        // Validate coordinates
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            return res.status(400).json({ success: false, message: "Invalid coordinates" });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            {
+                location: {
+                    type: "Point",
+                    coordinates: [parseFloat(longitude), parseFloat(latitude)]
+                }
+            },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Location updated successfully",
+            user
+        });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: `Update location error: ${error.message}` });
     }
 }
