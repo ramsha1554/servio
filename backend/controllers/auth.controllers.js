@@ -16,7 +16,7 @@ export const signUp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10)
         
         // Root Cause Fix: Explicitly omit location during signup
-        const user = await User.create({
+        user = await User.create({
             fullName,
             email,
             role,
