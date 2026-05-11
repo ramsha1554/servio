@@ -2,27 +2,27 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import Order from './models/order.model.js';
-
-async function run() {
-    await mongoose.connect(process.env.MONGODB_URL);
-    console.log("Database connected.");
-    
+const dropIndex = async () => {
     try {
-        await Order.collection.dropIndex("location.coordinates_2dsphere");
-        console.log("Dropped index location.coordinates_2dsphere");
-    } catch(err) {
-        console.log("Error dropping index (may not exist):", err.message);
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log("Connected to MongoDB");
+
+        const collection = mongoose.connection.collection('users');
+        
+        // Attempt to drop the likely problematic index
+        try {
+            await collection.dropIndex("location_2dsphere");
+            console.log("Successfully dropped 'location_2dsphere' index.");
+        } catch (e) {
+            console.log("Index 'location_2dsphere' not found or already dropped.");
+        }
+
+        console.log("The index will be automatically recreated as a 'sparse' index on your next server start.");
+        process.exit(0);
+    } catch (error) {
+        console.error("Error dropping index:", error);
+        process.exit(1);
     }
+};
 
-    // Wait a bit for Mongoose to auto-create the new one since order.model.js is imported
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const indexes = await Order.collection.getIndexes();
-    console.log("Current Order Indexes:");
-    console.dir(indexes, { depth: null });
-    
-    process.exit(0);
-}
-
-run();
+dropIndex();
