@@ -20,41 +20,40 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
-    password:{
+    password: {
         type: String, // not used the required because of google login
     },
-    mobile:{
+    mobile: {
         type: String,
-        required: true, 
+        required: true,
     },
-    role:{
-        type:String,
-        enum:["user","owner","deliveryBoy","admin"],
-        required:true
+    role: {
+        type: String,
+        enum: ["user", "owner", "deliveryBoy", "admin"],
+        required: true
     },
-    resetOtp:{
-        type:String
+    resetOtp: {
+        type: String
     },
-    isOtpVerified:{
-        type:Boolean,
-        default:false
+    isOtpVerified: {
+        type: Boolean,
+        default: false
     },
-    otpExpires:{
-        type:Date
+    otpExpires: {
+        type: Date
     },
-    socketId:{
-     type:String,
-     
+    socketId: {
+        type: String,
+
     },
-    isOnline:{
-        type:Boolean,
-        default:false
+    isOnline: {
+        type: Boolean,
+        default: false
     },
     location: {
         type: pointSchema,
-        index: '2dsphere',
         default: undefined
     },
     deviceToken: {
@@ -79,5 +78,5 @@ const userSchema = new mongoose.Schema({
 // userSchema.index({ location: "2dsphere" }, { sparse: true });
 
 
-const User=mongoose.model("User",userSchema)
+const User = mongoose.model("User", userSchema)
 export default User
