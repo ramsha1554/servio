@@ -4,11 +4,16 @@ import User from "../models/user.model.js"
 const isAuth = async (req, res, next) => {
     try {
         const token = req.cookies.token
+        console.log("isAuth Check - Token Present:", !!token);
+        
         if (!token) {
+            console.log("isAuth Error: No token found in cookies. Cookies received:", req.cookies);
             return res.status(401).json({ success: false, message: "Authentication required. Token not found." })
         }
 
         const decodeToken = jwt.verify(token, process.env.JWT_SECRET)
+        console.log("isAuth Check - Token Verified. UserID:", decodeToken?.userId);
+        
         if (!decodeToken) {
             return res.status(401).json({ success: false, message: "Invalid or expired token." })
         }
