@@ -438,8 +438,11 @@ export const resetPassword = async (req, res) => {
 // Replacement for old googleAuth controller
 export const googleCallback = async (req, res) => {
     try {
+        // req.user is populated by Passport after successful handshake
         const user = req.user;
+        
         if (!user) {
+            console.error("No user found in request after Passport authentication");
             return res.redirect(`${process.env.FRONTEND_URL}/signin?error=auth_failed`);
         }
 
@@ -449,14 +452,16 @@ export const googleCallback = async (req, res) => {
 
         const token = await genToken(user._id);
         
+        // Use a more robust cookie configuration for cross-domain (Render to Vercel)
         res.cookie("token", token, {
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            secure: true, 
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            httpOnly: true
+            httpOnly: true,
+            path: "/" 
         });
 
-        // Redirect back to frontend home
+        // Redirect back to frontend
         return res.redirect(`${process.env.FRONTEND_URL}/`);
     } catch (error) {
         logger.error("googleCallback error", { error: error.message });

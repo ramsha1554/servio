@@ -54,6 +54,6 @@ authRouter.get("/google", (req, res, next) => {
     passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
 })
 
-authRouter.get("/google/callback", passport.authenticate("google", { failureRedirect: "/signin?error=auth_failed", session: false }), googleCallback)
+authRouter.get("/google/callback", passport.authenticate("google", { failureRedirect: "/signin?error=auth_failed" }), googleCallback)
 
 export default authRouter
