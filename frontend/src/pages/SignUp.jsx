@@ -199,19 +199,19 @@ function SignUp() {
 export default SignUp
 
 // ============ BACKUP (original code before Passport migration) ============
-// import React, { useState } from 'react'
-// import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-// import { FcGoogle } from "react-icons/fc";
-// import { useNavigate } from 'react-router-dom';
-// import axios from "axios"
-// import { serverUrl } from '../App';
-// import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-// import { auth } from '../../firebase';
-// import { useDispatch } from 'react-redux';
-// import { setUserData } from '../redux/userSlice';
-// import Button from '../components/ui/Button';
-// import Input from '../components/ui/Input';
-// import Card from '../components/ui/Card';
+// backup_import React, { useState } from 'react'
+// backup_import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+// backup_import { FcGoogle } from "react-icons/fc";
+// backup_import { useNavigate } from 'react-router-dom';
+// backup_import axios from "axios"
+// backup_import { serverUrl } from '../App';
+// backup_import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+// backup_import { auth } from '../../firebase';
+// backup_import { useDispatch } from 'react-redux';
+// backup_import { setUserData } from '../redux/userSlice';
+// backup_import Button from '../components/ui/Button';
+// backup_import Input from '../components/ui/Input';
+// backup_import Card from '../components/ui/Card';
 // 
 // function SignUp() {
 //     const [showPassword, setShowPassword] = useState(false)
