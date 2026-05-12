@@ -131,7 +131,22 @@ const server = http.createServer(app)
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(",")
-    : ["http://localhost:5173"];
+    : ["http://localhost:5173", "https://servio-livid.vercel.app"];
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(null, false);
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+};
+
+app.use(cors(corsOptions));
 
 // Session is required for Passport OAuth flow state
 app.use(session({
@@ -148,35 +163,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const io = new Server(server, {
-    cors: {
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-    },
-    allowEIO3: true
+    cors: corsOptions,
+    allowEIO3: true,
+    transports: ['websocket', 'polling']
 });
 
 app.set("io", io);
 
 const port = process.env.PORT || 8000;
-
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-}));
 
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff')
