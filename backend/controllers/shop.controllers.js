@@ -2,6 +2,7 @@ import Shop from "../models/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import redis from "../config/redis.js";
 import logger from "../config/logger.js";
+import { LOGISTICS_CONFIG } from "../config/logistics.config.js";
 
 export const createEditShop = async (req, res) => {
     try {
@@ -100,6 +101,19 @@ export const getShopByCity = async (req, res) => {
         const shops = await Shop.find({
             city: { $regex: new RegExp(`^${city}$`, "i") }
         }).populate('items')
+
+        // Integrity Observability: Check for invalid coordinates
+        if (LOGISTICS_CONFIG.ENABLE_CLUSTER_VALIDATION) {
+            shops.forEach(shop => {
+                if (!shop.location || !shop.location.coordinates || shop.location.coordinates[0] === 0) {
+                    logger.warn("Shop missing valid coordinates for cluster validation", {
+                        endpoint: "getShopByCity",
+                        shopId: shop._id,
+                        shopName: shop.name
+                    });
+                }
+            });
+        }
         
         if (!shops || shops.length === 0) {
             return res.status(200).json([]) // Return empty array instead of 400
