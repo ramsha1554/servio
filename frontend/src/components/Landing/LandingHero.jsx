@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Play, ArrowRight, Star, MapPin, Clock, Utensils } from 'lucide-react';
+import { Play, ArrowRight } from 'lucide-react';
+
 import { MdDeliveryDining } from 'react-icons/md';
 import { RiSecurePaymentLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
