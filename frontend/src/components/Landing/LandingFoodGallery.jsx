@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 // CLOUDINARY BASE URL & TRANSFORMATIONS
-const CLOUDINARY_BASE = "https://res.cloudinary.com/dajowhvrx/image/upload/f_auto,q_auto,w_800/v1/servio_landing/";
+const CLOUDINARY_BASE = "https://res.cloudinary.com/dajowhvrx/image/upload/f_auto,q_auto,w_800/servio_landing/";
+
 
 const images = [
   {
