@@ -159,3 +159,19 @@ storage/
 .*
 !.gitignore
 !.env.example
+
+# Seeder Credentials & State
+backend/utils/seeder/generated_owner_credentials.json
+backend/utils/seeder/temp/
+backend/utils/seeder/state.json
+
+# Temporary / Junk Files
+generated_owner_credentials.json
+*.backup.js
+*.bak
+backups/
+temp/
+state.json
+seeding_report.log
+.env
+backend/.env

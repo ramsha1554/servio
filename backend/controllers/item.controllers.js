@@ -3,6 +3,7 @@ import Shop from "../models/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import redis from "../config/redis.js";
 import logger from "../config/logger.js";
+import { LOGISTICS_CONFIG } from "../config/logistics.config.js";
 
 export const addItem = async (req, res) => {
     try {
@@ -164,7 +165,20 @@ export const getItemByCity = async (req, res) => {
         
         const shopIds = shops.map((shop) => shop._id)
 
-        const items = await Item.find({ shop: { $in: shopIds } }).populate("shop", "name image address")
+        const items = await Item.find({ shop: { $in: shopIds } }).populate("shop", "name image address location")
+
+        // Integrity Observability: Log missing coordinates if validation is enabled
+        if (LOGISTICS_CONFIG.ENABLE_CLUSTER_VALIDATION) {
+            items.forEach(item => {
+                if (!item.shop?.location || !item.shop.location.coordinates || item.shop.location.coordinates[0] === 0) {
+                    logger.warn("Restaurant data missing valid coordinates for cluster validation", {
+                        endpoint: "getItemByCity",
+                        shopId: item.shop?._id,
+                        shopName: item.shop?.name
+                    });
+                }
+            });
+        }
 
         // Set cache safely
         try {
@@ -216,7 +230,20 @@ export const searchItems = async (req, res) => {
                 { category: { $regex: query, $options: "i" } }
             ]
 
-        }).populate("shop", "name image")
+        }).populate("shop", "name image address location")
+
+        // Integrity Observability: Log missing coordinates if validation is enabled
+        if (LOGISTICS_CONFIG.ENABLE_CLUSTER_VALIDATION) {
+            items.forEach(item => {
+                if (!item.shop?.location || !item.shop.location.coordinates || item.shop.location.coordinates[0] === 0) {
+                    logger.warn("Restaurant data missing valid coordinates for cluster validation", {
+                        endpoint: "searchItems",
+                        shopId: item.shop?._id,
+                        shopName: item.shop?.name
+                    });
+                }
+            });
+        }
 
         return res.status(200).json(items)
 

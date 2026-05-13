@@ -3,7 +3,10 @@ import logger from "./logger.js"
 
 const connectDb = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URL)
+        await mongoose.connect(process.env.MONGODB_URL, {
+            tls: true,
+            tlsAllowInvalidCertificates: true
+        })
         logger.info("Database connected successfully")
     } catch (error) {
         logger.error("Database connection error", { error })
