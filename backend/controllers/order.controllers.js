@@ -7,6 +7,7 @@ import RazorPay from "razorpay"
 import dotenv from "dotenv"
 import crypto from "crypto"
 import logger from "../config/logger.js"
+import { calculateDistance } from "../utils/geoUtils.js"
 
 dotenv.config()
 let instance = new RazorPay({
@@ -29,12 +30,28 @@ export const placeOrder = async (req, res) => {
             groupItemsByShop[shopId].push(item)
         });
 
-        const shopOrders = await Promise.all(Object.keys(groupItemsByShop).map(async (shopId) => {
-            const shop = await Shop.findById(shopId).populate("owner")
-            if (!shop) {
-                throw new Error(`Shop not found: ${shopId}`)
+        const uniqueShopIds = Object.keys(groupItemsByShop)
+        const uniqueShops = await Shop.find({ _id: { $in: uniqueShopIds } }).populate("owner")
+
+        // Multi-vendor Distance Validation (3KM Cluster Rule)
+        if (uniqueShops.length > 1) {
+            for (let i = 0; i < uniqueShops.length; i++) {
+                for (let j = i + 1; j < uniqueShops.length; j++) {
+                    const dist = calculateDistance(
+                        uniqueShops[i].location.coordinates,
+                        uniqueShops[j].location.coordinates
+                    );
+                    if (dist > 3.05) {
+                        return res.status(400).json({
+                            message: `Distance cluster violation: Restaurants ${uniqueShops[i].name} and ${uniqueShops[j].name} are ${dist.toFixed(2)}km apart. Maximum allowed distance for multi-vendor orders is 3KM.`
+                        });
+                    }
+                }
             }
-            const items = groupItemsByShop[shopId]
+        }
+
+        const shopOrders = uniqueShops.map((shop) => {
+            const items = groupItemsByShop[shop._id.toString()]
             const subtotal = items.reduce((sum, i) => sum + Number(i.price) * Number(i.quantity), 0)
             return {
                 shop: shop._id,
@@ -47,7 +64,7 @@ export const placeOrder = async (req, res) => {
                     name: i.name
                 }))
             }
-        }))
+        })
 
         if (paymentMethod == "online") {
             const razorOrder = await instance.orders.create({
@@ -532,9 +549,9 @@ export const getCurrentOrder = async (req, res) => {
 
     } catch (error) {
         logger.error("getCurrentOrder error", { error: error.message })
-        return res.status(500).json({ 
-            success: false, 
-            message: "getCurrentOrder error " + error.message 
+        return res.status(500).json({
+            success: false,
+            message: "getCurrentOrder error " + error.message
         })
     }
 }
