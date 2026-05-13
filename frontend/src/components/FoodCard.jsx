@@ -7,38 +7,58 @@ import { FaMinus } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '../redux/userSlice';
+import { addToCartValidated } from '../redux/cartThunks';
 
+/**
+ * Hardened FoodCard component.
+ * Uses the authoritative addToCartValidated thunk for all cart additions.
+ */
 function FoodCard({ data }) {
     const [quantity, setQuantity] = useState(0)
     const dispatch = useDispatch()
-    const { cartItems } = useSelector(state => state.user)
+    
+    // Connect to the new domain-separated cart slice
+    const { items, operationState } = useSelector(state => state.cart)
+    const isInCart = items.some(i => i.id === data._id);
+
     const renderStars = (rating) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             stars.push(
                 (i <= rating) ? (
-                    <FaStar className='text-yellow-400 text-sm' />
+                    <FaStar key={i} className='text-yellow-400 text-sm' />
                 ) : (
-                    <FaRegStar className='text-yellow-400 text-sm' />
+                    <FaRegStar key={i} className='text-yellow-400 text-sm' />
                 )
             )
-
         }
         return stars
     }
 
     const handleIncrease = () => {
-        const newQty = quantity + 1
-        setQuantity(newQty)
+        setQuantity(prev => prev + 1)
     }
+
     const handleDecrease = () => {
         if (quantity > 0) {
-            const newQty = quantity - 1
-            setQuantity(newQty)
+            setQuantity(prev => prev - 1)
         }
-
     }
+
+    const handleAddToCartClick = () => {
+        if (quantity === 0) return;
+
+        // Orchestrate via the authoritative thunk
+        dispatch(addToCartValidated({
+            id: data._id,
+            name: data.name,
+            price: data.price,
+            image: data.image,
+            shop: data.shop,
+            quantity,
+            foodType: data.foodType
+        }));
+    };
 
     return (
         <div className='w-[260px] rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group transform hover:-translate-y-1'>
@@ -46,9 +66,11 @@ function FoodCard({ data }) {
                 <div className='absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm text-xs font-bold text-gray-700 z-10'>
                     {data.shop?.name || "Premium Shop"}
                 </div>
-                <div className='absolute top-3 right-3 bg-white rounded-full p-1.5 shadow-md z-10'>{data.foodType == "veg" ? <FaLeaf className='text-green-500 text-sm' /> : <FaDrumstickBite className='text-red-500 text-sm' />}</div>
+                <div className='absolute top-3 right-3 bg-white rounded-full p-1.5 shadow-md z-10'>
+                    {data.foodType === "veg" ? <FaLeaf className='text-green-500 text-sm' /> : <FaDrumstickBite className='text-red-500 text-sm' />}
+                </div>
 
-                <img src={data.image} alt="" className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110' />
+                <img src={data.image} alt={data.name} className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110' />
 
                 {/* Quick Overlay Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -85,21 +107,9 @@ function FoodCard({ data }) {
                         )}
 
                         <button
-                            className={`${cartItems.some(i => i.id == data._id) ? "bg-gray-800" : "bg-[#ff4d2d]"} text-white p-2.5 rounded-full shadow-lg shadow-[#ff4d2d]/30 hover:scale-110 active:scale-95 transition-all duration-300`}
-                            onClick={() => {
-                                if (quantity > 0) {
-                                    dispatch(addToCart({
-                                        id: data._id,
-                                        name: data.name,
-                                        price: data.price,
-                                        image: data.image,
-                                        shop: data.shop,
-                                        quantity,
-                                        foodType: data.foodType
-                                    }))
-                                }
-                            }}
-                            disabled={quantity === 0 && !cartItems.some(i => i.id == data._id)}
+                            className={`${isInCart ? "bg-gray-800" : "bg-[#ff4d2d]"} text-white p-2.5 rounded-full shadow-lg shadow-[#ff4d2d]/30 hover:scale-110 active:scale-95 transition-all duration-300 disabled:opacity-50`}
+                            onClick={handleAddToCartClick}
+                            disabled={(quantity === 0 && !isInCart) || operationState.addPending}
                         >
                             <FaShoppingCart size={16} />
                         </button>

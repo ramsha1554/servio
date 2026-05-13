@@ -8,6 +8,8 @@ import useGetShopByCity from './hooks/useGetShopByCity'
 import useGetItemsByCity from './hooks/useGetItemsByCity'
 import useGetMyOrders from './hooks/useGetMyOrders'
 import useUpdateLocation from './hooks/useUpdateLocation'
+import { useEffect } from 'react'
+import { hydrateCartThunk, syncFromStorageThunk } from './redux/cartThunks'
 
 const SignUp = lazy(() => import('./pages/SignUp'))
 const SignIn = lazy(() => import('./pages/SignIn'))
@@ -26,6 +28,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 import { API_URL } from './config'
+import ClusterModal from './components/ClusterModal'
 
 export const serverUrl = API_URL
 function App() {
@@ -38,6 +41,28 @@ function App() {
   useGetShopByCity()
   useGetItemsByCity()
   useGetMyOrders()
+
+  useEffect(() => {
+    // 1. Initial Hydration from Cold Start
+    dispatch(hydrateCartThunk());
+
+    // 2. Storage Event Listener for Multi-Tab Sync
+    const handleStorageChange = (e) => {
+      // e.key is 'servio_cart_v2' for the new versioned state
+      if (e.key === 'servio_cart_v2') {
+        if (!e.newValue) return;
+        try {
+          const payload = JSON.parse(e.newValue);
+          dispatch(syncFromStorageThunk(payload));
+        } catch (err) {
+          console.error("Storage Sync Parse Error:", err);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [dispatch]);
 
 
   if (isCheckingAuth) {
@@ -52,6 +77,7 @@ function App() {
         <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary'></div>
       </div>
     }>
+      <ClusterModal />
       <Routes>
         <Route path='/signup' element={!userData ? <SignUp /> : <Navigate to={"/"} />} />
         <Route path='/signin' element={!userData ? <SignIn /> : <Navigate to={"/"} />} />
