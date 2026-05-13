@@ -97,6 +97,17 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
 * {
   /* ya scroll */
   scrollbar-width: none;
@@ -105,8 +116,7 @@
   /* IE/Edge purane versions */
 }
 
-::-webkit-scrollbar,
 ::-webkit-scrollbar {
   display: none;
   /* Chrome, Safari, Opera */
-}
+}
