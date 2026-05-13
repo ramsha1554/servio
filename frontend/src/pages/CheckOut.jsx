@@ -20,9 +20,13 @@ import { addMyOrder, setTotalAmount } from '../redux/userSlice';
 
 function CheckOut() {
   const { location, address } = useSelector(state => state.map)
-  const { cartItems, totalAmount, userData } = useSelector(state => state.user)
+  const { userData } = useSelector(state => state.user)
+  const { items: cartItems, status, operationState } = useSelector(state => state.cart)
   const [addressInput, setAddressInput] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cod")
+
+  // Calculate Total locally from the domain-separated cart
+  const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   // Coupon States
   const [promoCode, setPromoCode] = useState("")
@@ -35,6 +39,13 @@ function CheckOut() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const apiKey = import.meta.env.VITE_GEOAPIKEY
+
+  // Hard Check: Redirect if cart is invalid or empty
+  useEffect(() => {
+    if (status === 'EMPTY' || status === 'RECOVERY_REQUIRED') {
+      navigate('/cart');
+    }
+  }, [status, navigate]);
 
   // Calculate Fees
   const deliveryFee = totalAmount > 500 ? 0 : 40
@@ -114,7 +125,7 @@ function CheckOut() {
   }
 
   const handlePlaceOrder = async () => {
-    if (isPlacing) return;
+    if (isPlacing || status !== 'ACTIVE') return;
     setIsPlacing(true)
     try {
       const orderPayload = {
