@@ -5,6 +5,13 @@ import UserDashboard from '../components/UserDashboard'
 import OwnerDashboard from '../components/OwnerDashboard'
 import DeliveryBoy from '../components/DeliveryBoy'
 
+// New Landing Components
+import LandingNavbar from '../components/Landing/LandingNavbar'
+import LandingHero from '../components/Landing/LandingHero'
+import LandingOffers from '../components/Landing/LandingOffers'
+import LandingFoodGallery from '../components/Landing/LandingFoodGallery'
+import LandingFooter from '../components/Landing/LandingFooter'
+
 function Home() {
   const { userData } = useSelector(state => state.user)
 
@@ -13,29 +20,28 @@ function Home() {
       return <Navigate to="/admin" replace />
   }
 
+  // PUBLIC LANDING PAGE (Unauthenticated)
   if (!userData) {
       return (
-          <div className='w-[100vw] min-h-[100vh] pt-[100px] flex flex-col items-center bg-primary-50'>
-              <h1 className='text-4xl font-bold text-primary'>Welcome to Servio</h1>
-              <p className='mt-4 text-gray-600'>Please sign in to explore our delicious food delivery options.</p>
-              <button 
-                  onClick={() => window.location.href = "/signin"}
-                  className='mt-6 px-6 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90'
-              >
-                  Sign In Now
-              </button>
+          <div className='w-full min-h-screen bg-white'>
+              <LandingNavbar />
+              <LandingHero />
+              <LandingOffers />
+              <LandingFoodGallery />
+              <LandingFooter />
           </div>
       )
   }
 
+  // PRIVATE DASHBOARDS (Authenticated)
   return (
-    <div className='w-[100vw] min-h-[100vh] pt-[100px] flex flex-col items-center bg-primary-50'>
+    <div className='w-full min-h-screen pt-[100px] bg-[#fff9f6]'>
       {userData && (
-          <>
+          <div className="max-w-7xl mx-auto px-6">
               {userData.role === "user" && <UserDashboard />}
               {userData?.role === 'owner' && <OwnerDashboard />}
               {userData.role === "deliveryBoy" && <DeliveryBoy />}
-          </>
+          </div>
       )}
     </div>
   )
