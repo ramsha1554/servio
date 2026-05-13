@@ -1,44 +1,47 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+// CLOUDINARY BASE URL & TRANSFORMATIONS
+const CLOUDINARY_BASE = "https://res.cloudinary.com/dajowhvrx/image/upload/f_auto,q_auto,w_800/v1/servio_landing/";
+
 const images = [
   {
-    url: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&q=80&w=800",
+    id: "biryani",
     title: "Hyderabadi Biryani",
     span: "md:col-span-2 md:row-span-2"
   },
   {
-    url: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&q=80&w=600",
+    id: "butter_chicken",
     title: "Butter Chicken",
     span: "md:col-span-1 md:row-span-1"
   },
   {
-    url: "https://images.unsplash.com/photo-1567184109411-47a7a3948530?auto=format&fit=crop&q=80&w=600",
+    id: "paneer_tikka",
     title: "Paneer Tikka",
     span: "md:col-span-1 md:row-span-1"
   },
   {
-    url: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=800",
+    id: "masala_dosa",
     title: "Masala Dosa",
     span: "md:col-span-2 md:row-span-1"
   },
   {
-    url: "https://images.unsplash.com/photo-1601050648497-3f9ebaec5b43?auto=format&fit=crop&q=80&w=600",
+    id: "samosa_platter",
     title: "Samosa Platter",
     span: "md:col-span-1 md:row-span-2"
   },
   {
-    url: "https://images.unsplash.com/photo-1610057099431-d73a1c9d2f2f?auto=format&fit=crop&q=80&w=600",
+    id: "tandoori_chicken",
     title: "Tandoori Specialties",
     span: "md:col-span-1 md:row-span-1"
   },
   {
-    url: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&q=80&w=600",
+    id: "premium_thali",
     title: "Premium Thali",
     span: "md:col-span-1 md:row-span-1"
   },
   {
-    url: "https://images.unsplash.com/photo-1589301773859-6799516624a0?auto=format&fit=crop&q=80&w=600",
+    id: "gulab_jamun",
     title: "Gulab Jamun",
     span: "md:col-span-1 md:row-span-1"
   }
@@ -68,24 +71,26 @@ const LandingFoodGallery = () => {
           </motion.h2>
         </div>
 
-        {/* Masonry-style Grid */}
+        {/* Production-Grade Masonry Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 auto-rows-[200px]">
           {images.map((img, index) => (
             <motion.div
-              key={index}
+              key={img.id}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.05 }}
-              className={`relative group overflow-hidden rounded-[2rem] cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-500 ${img.span}`}
+              className={`relative group overflow-hidden rounded-[2.5rem] cursor-pointer shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:shadow-[0_30px_60px_-15px_rgba(255,77,45,0.2)] transition-all duration-500 bg-gray-50 ${img.span}`}
             >
+              {/* Cloudinary CDN Image */}
               <img 
-                src={img.url} 
+                src={`${CLOUDINARY_BASE}${img.id}.jpg`} 
                 alt={img.title}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               
-              {/* Overlay */}
+              {/* Premium Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
                 <p className="text-white font-black text-xl tracking-tight translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   {img.title}
@@ -93,8 +98,8 @@ const LandingFoodGallery = () => {
                 <div className="w-8 h-1 bg-[#ff4d2d] mt-2 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               </div>
 
-              {/* Subtle Inner Glow */}
-              <div className="absolute inset-0 border border-white/10 rounded-[2rem] pointer-events-none" />
+              {/* Inner Depth Border */}
+              <div className="absolute inset-0 border border-white/10 rounded-[2.5rem] pointer-events-none" />
             </motion.div>
           ))}
         </div>
