@@ -96,3 +96,11 @@ export const OrderSchema = {
         otp: z.string().optional() // Optional because sendOtp doesn't submit it, verify does
     })
 };
+
+export const CoordinateSchema = z.array(z.number())
+    .length(2, "Coordinates must be exactly [longitude, latitude]")
+    .refine((coords) => {
+        const [lon, lat] = coords;
+        return lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90;
+    }, "Invalid longitude or latitude range");
+

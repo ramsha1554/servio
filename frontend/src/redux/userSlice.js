@@ -110,9 +110,14 @@ const userSlice = createSlice({
     },
     setCityManuallySelected: (state, action) => {
       state.cityManuallySelected = action.payload
+    },
+    clearCart: (state) => {
+      state.cartItems = []
+      state.totalAmount = 0
+      localStorage.removeItem("servio_cart")
     }
   }
 })
 
-export const { setUserData, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount, updateRealtimeOrderStatus, setIsCheckingAuth, setCityManuallySelected } = userSlice.actions
+export const { setUserData, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount, updateRealtimeOrderStatus, setIsCheckingAuth, setCityManuallySelected, clearCart } = userSlice.actions
 export default userSlice.reducer
