@@ -4,7 +4,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import UserOrderCard from '../components/UserOrderCard';
 import OwnerOrderCard from '../components/OwnerOrderCard';
-import { setMyOrders, updateOrderStatus, updateRealtimeOrderStatus } from '../redux/userSlice';
+import { setMyOrders, updateRealtimeOrderStatus } from '../redux/userSlice';
 
 
 import { useSocket } from '../context/SocketContext'; // Add import
@@ -37,7 +37,7 @@ function MyOrders() {
 
 
   return (
-    <div className='w-full min-h-screen bg-[#fff9f6] flex justify-center px-4'>
+    <div data-testid="my-orders-page" className='w-full min-h-screen bg-[#fff9f6] flex justify-center px-4'>
       <div className='w-full max-w-[800px] p-4'>
 
         <div className='flex items-center gap-[20px] mb-6 '>
@@ -47,7 +47,9 @@ function MyOrders() {
           <h1 className='text-2xl md:text-3xl font-bold  text-start'>My Orders</h1>
         </div>
         <div className='space-y-6'>
-          {myOrders?.map((order, index) => (
+          {myOrders?.length === 0 ? (
+            <div data-testid="orders-empty-state" className="text-center py-12 text-gray-500">No orders yet</div>
+          ) : myOrders?.map((order, index) => (
             userData?.role == "user" ?
               (
                 <UserOrderCard data={order} key={index} />

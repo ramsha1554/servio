@@ -13,6 +13,7 @@ function TrackOrderPage() {
   const [currentOrder, setCurrentOrder] = useState()
   const navigate = useNavigate()
   const socket = useSocket()
+  const { userData } = useSelector(state => state.user)
   const [liveLocations, setLiveLocations] = useState({})
   const handleGetOrder = async () => {
     try {
@@ -24,21 +25,32 @@ function TrackOrderPage() {
   }
 
   useEffect(() => {
-    if (!socket) return;
-    socket.on('updateDeliveryLocation', ({ deliveryBoyId, latitude, longitude }) => {
+    if (!socket || !orderId || !userData?._id) return;
+    
+    socket.emit('joinOrder', { orderId, userId: userData._id });
+
+    socket.on('deliveryLocationUpdate', ({ deliveryBoyId, latitude, longitude }) => {
       setLiveLocations(prev => ({
         ...prev,
         [deliveryBoyId]: { lat: latitude, lon: longitude }
       }))
     })
-    return () => socket.off('updateDeliveryLocation');
-  }, [socket])
+
+    socket.on('statusUpdate', () => {
+      handleGetOrder(); // Refresh order data to get new status
+    });
+
+    return () => {
+      socket.off('deliveryLocationUpdate');
+      socket.off('statusUpdate');
+    };
+  }, [socket, orderId, userData?._id])
 
   useEffect(() => {
     handleGetOrder()
   }, [orderId])
   return (
-    <div className='max-w-4xl mx-auto p-4 flex flex-col gap-6'>
+    <div data-testid="track-order-page" className='max-w-4xl mx-auto p-4 flex flex-col gap-6'>
       <div className='relative flex items-center gap-4 top-[20px] left-[20px] z-[10] mb-[10px]' onClick={() => navigate("/")}>
         <IoIosArrowRoundBack size={35} className='text-[#ff4d2d]' />
         <h1 className='text-2xl font-bold md:text-center'>Track Order</h1>
@@ -51,13 +63,32 @@ function TrackOrderPage() {
             <p><span className='font-semibold'>Subtotal:</span> {shopOrder.subtotal}</p>
             <p className='mt-6'><span className='font-semibold'>Delivery address:</span> {currentOrder.deliveryAddress?.text}</p>
           </div>
-          {shopOrder.status != "delivered" ? <>
-            {shopOrder.assignedDeliveryBoy ?
-              <div className='text-sm text-gray-700'>
-                <p className='font-semibold'><span>Delivery Boy Name:</span> {shopOrder.assignedDeliveryBoy.fullName}</p>
-                <p className='font-semibold'><span>Delivery Boy contact No.:</span> {shopOrder.assignedDeliveryBoy.mobile}</p>
-              </div> : <p className='font-semibold'>Delivery Boy is not assigned yet.</p>}
-          </> : <p className='text-green-600 font-semibold text-lg'>Delivered</p>}
+          <div className='flex flex-wrap gap-2 mt-4'>
+            {["pending", "preparing", "out of delivery", "on_the_way", "delivered"].map((step, i) => (
+              <div key={i} data-testid={shopOrder.status === step ? "track-order-status" : undefined} className={`text-xs px-2 py-1 rounded-full border ${shopOrder.status === step ? 'bg-orange-500 text-white border-orange-500' : 'bg-gray-100 text-gray-400 border-gray-200'}`}>
+                {step.replace(/_/g, ' ').toUpperCase()}
+              </div>
+            ))}
+          </div>
+
+          {shopOrder.status !== "delivered" ? (
+            <div className='text-sm text-gray-700 space-y-2 mt-4'>
+              {shopOrder.assignedDeliveryBoy ? (
+                <>
+                  <p className='font-semibold'><span>Delivery Partner:</span> {shopOrder.assignedDeliveryBoy.fullName}</p>
+                  {shopOrder.assignedDeliveryBoy.mobile ? (
+                    <p className='font-semibold'><span>Contact:</span> {shopOrder.assignedDeliveryBoy.mobile}</p>
+                  ) : (
+                    <p className='text-xs text-gray-400 italic'>Contact information hidden</p>
+                  )}
+                </>
+              ) : (
+                <p className='font-semibold text-orange-400'>Looking for a delivery partner...</p>
+              )}
+            </div>
+          ) : (
+            <p className='text-green-600 font-semibold text-lg mt-4'>Order Delivered!</p>
+          )}
 
           {(shopOrder.assignedDeliveryBoy && shopOrder.status !== "delivered") && (
             <div className="h-[400px] w-full rounded-2xl overflow-hidden shadow-md">

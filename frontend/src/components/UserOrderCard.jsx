@@ -30,7 +30,7 @@ function UserOrderCard({ data }) {
 
 
     return (
-        <div className='bg-white rounded-lg shadow p-4 space-y-4'>
+        <div data-testid="user-order-card" className='bg-white rounded-lg shadow p-4 space-y-4'>
             <div className='flex justify-between border-b pb-2'>
                 <div>
                     <p className='font-semibold'>
@@ -71,14 +71,14 @@ function UserOrderCard({ data }) {
                     </div>
                     <div className='flex justify-between items-center border-t pt-2'>
                         <p className='font-semibold'>Subtotal: {shopOrder.subtotal}</p>
-                        <span className='text-sm font-medium text-blue-600'>{shopOrder.status}</span>
+                        <span data-testid="order-status" className='text-sm font-medium text-blue-600'>{shopOrder.status}</span>
                     </div>
                 </div>
             ))}
 
             <div className='flex justify-between items-center border-t pt-2'>
                 <p className='font-semibold'>Total: ₹{data.totalAmount}</p>
-                <button className='bg-[#ff4d2d] hover:bg-[#e64526] text-white px-4 py-2 rounded-lg text-sm' onClick={() => navigate(`/track-order/${data._id}`)}>Track Order</button>
+                <button data-testid="track-order-btn" className='bg-[#ff4d2d] hover:bg-[#e64526] text-white px-4 py-2 rounded-lg text-sm' onClick={() => navigate(`/track-order/${data._id}`)}>Track Order</button>
             </div>
 
 

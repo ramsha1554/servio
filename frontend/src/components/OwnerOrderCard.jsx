@@ -31,9 +31,9 @@ function OwnerOrderCard({ data }) {
 
 
     return (
-        <div className='bg-white rounded-lg shadow p-4 space-y-4'>
+        <div data-testid="owner-order-card" className='bg-white rounded-lg shadow p-4 space-y-4'>
             <div>
-                <h2 className='text-lg font-semibold text-gray-800'>{data.user.fullName}</h2>
+                <h2 data-testid="owner-order-customer-name" className='text-lg font-semibold text-gray-800'>{data.user.fullName}</h2>
                 <p className='text-sm text-gray-500'>{data.user.email}</p>
                 <p className='flex items-center gap-2 text-sm text-gray-600 mt-1'><MdPhone /><span>{data.user.mobile}</span></p>
                 {data.paymentMethod == "online" ? <p className='gap-2 text-sm text-gray-600'>payment: {data.payment ? "true" : "false"}</p> : <p className='gap-2 text-sm text-gray-600'>Payment Method: {data.paymentMethod}</p>}
@@ -56,10 +56,10 @@ function OwnerOrderCard({ data }) {
             </div>
 
             <div className='flex justify-between items-center mt-auto pt-3 border-t border-gray-100'>
-                <span className='text-sm'>status: <span className='font-semibold capitalize text-[#ff4d2d]'>{data.shopOrders.status}</span>
+                <span className='text-sm'>status: <span data-testid="owner-order-status" className='font-semibold capitalize text-[#ff4d2d]'>{data.shopOrders.status}</span>
                 </span>
 
-                <select className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e) => handleUpdateStatus(data._id, data.shopOrders.shop._id, e.target.value)}>
+                <select data-testid="owner-status-select" className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e) => handleUpdateStatus(data._id, data.shopOrders.shop._id, e.target.value)}>
                     <option value="">Change</option>
                     <option value="pending">Pending</option>
                     <option value="preparing">Preparing</option>
