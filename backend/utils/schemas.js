@@ -82,7 +82,7 @@ export const OrderSchema = {
         totalAmount: z.number().min(0)
     }),
     updateStatus: z.object({
-        status: z.enum(["prepared", "out of delivery", "delivered", "cancelled", "preparing"], {
+        status: z.enum(["pending", "preparing", "out of delivery", "on_the_way", "delivered", "cancelled"], {
             errorMap: () => ({ message: "Invalid status" })
         })
     }),
