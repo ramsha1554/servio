@@ -1,16 +1,22 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CartItemCard from '../components/CartItemCard';
 import { resolveRecovery, clearCart } from '../redux/cartSlice';
+import { revalidateCartPrices } from '../redux/cartThunks';
+import { ClipLoader } from 'react-spinners';
 
 function CartPage() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     
     // Connect to the new domain-separated cart slice
-    const { items, status, recovery } = useSelector(state => state.cart)
+    const { items, status, recovery, operationState } = useSelector(state => state.cart)
+
+    useEffect(() => {
+        dispatch(revalidateCartPrices());
+    }, [dispatch]);
 
     // Memoize total amount calculation
     const totalAmount = useMemo(() => {
@@ -30,7 +36,7 @@ function CartPage() {
     };
 
     return (
-        <div className='min-h-screen bg-[#fff9f6] flex justify-center p-6 pt-[100px]'>
+        <div data-testid="cart-page" className='min-h-screen bg-[#fff9f6] flex justify-center p-6 pt-[100px]'>
             <div className='w-full max-w-[800px] animate-fade-in-up'>
 
                 <div className='flex items-center gap-4 mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100'>
@@ -67,8 +73,13 @@ function CartPage() {
                     </div>
                 )}
 
-                {items?.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl shadow-sm border border-gray-100 text-center">
+                {operationState.hydrationPending ? (
+                    <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+                        <ClipLoader color="#ff4d2d" size={40} />
+                        <p className="mt-4 text-gray-500 font-medium">Syncing your cart...</p>
+                    </div>
+                ) : items?.length === 0 ? (
+                    <div data-testid="cart-empty-state" className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl shadow-sm border border-gray-100 text-center">
                         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                             <span className="text-4xl">🛒</span>
                         </div>
@@ -87,10 +98,11 @@ function CartPage() {
                         <div className='mt-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4'>
                             <div className="text-center sm:text-left">
                                 <p className='text-gray-500 font-medium text-sm'>Total to pay</p>
-                                <h1 className='text-3xl font-extrabold text-gray-900'>₹{totalAmount}</h1>
+                                <h1 data-testid="cart-grand-total" className='text-3xl font-extrabold text-gray-900'>₹{totalAmount}</h1>
                             </div>
 
                             <button
+                                data-testid="cart-checkout-btn"
                                 className={`px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2 ${isRecoveryRequired ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#ff4d2d] text-white hover:bg-[#e64526] hover:shadow-lg hover:shadow-[#ff4d2d]/30 transform hover:scale-[1.02] active:scale-[0.98]"}`}
                                 onClick={() => !isRecoveryRequired && navigate("/checkout")}
                                 disabled={isRecoveryRequired}

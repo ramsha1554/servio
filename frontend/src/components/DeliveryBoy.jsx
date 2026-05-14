@@ -25,6 +25,7 @@ function DeliveryBoy() {
   const [message, setMessage] = useState("")
   const [fetchedWithLocation, setFetchedWithLocation] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
+  const [statusUpdating, setStatusUpdating] = useState(false)
 
   const getAddress = async (lat, lon) => {
     try {
@@ -88,7 +89,8 @@ function DeliveryBoy() {
             socket.emit('updateLocation', {
               latitude,
               longitude,
-              userId: userData._id
+              userId: userData._id,
+              orderId: currentOrder?._id
             })
           }
         },
@@ -146,10 +148,14 @@ function DeliveryBoy() {
 
 
   const acceptOrder = async (assignmentId) => {
+    setStatusUpdating(true)
     try {
       const result = await axios.get(`${serverUrl}/api/order/accept-order/${assignmentId}`, { withCredentials: true })
       await getCurrentOrder()
     } catch (error) {
+      setErrorMsg(error.response?.data?.message || "Could not accept order")
+    } finally {
+      setStatusUpdating(false)
     }
   }
 
@@ -204,13 +210,19 @@ function DeliveryBoy() {
   }, [userData])
 
   useEffect(() => {
+    if (socket && currentOrder?._id && userData?._id) {
+      socket.emit('joinOrder', { orderId: currentOrder._id, userId: userData._id });
+    }
+  }, [socket, currentOrder?._id, userData?._id])
+
+  useEffect(() => {
     if (deliveryBoyLocation && !fetchedWithLocation) {
       getAssignments(deliveryBoyLocation.lat, deliveryBoyLocation.lon)
       setFetchedWithLocation(true)
     }
   }, [deliveryBoyLocation, fetchedWithLocation])
   return (
-    <div className='w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto'>
+    <div data-testid="delivery-dashboard" className='w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto'>
       <Nav />
       <div className='w-full max-w-[800px] flex flex-col gap-5 items-center'>
         <div className='bg-white rounded-2xl shadow-md p-5 flex flex-col justify-start items-center w-[90%] border border-orange-100 text-center gap-2'>
@@ -251,22 +263,29 @@ function DeliveryBoy() {
                 ?
                 (
                   availableAssignments.map((a, index) => (
-                    <div className='border rounded-lg p-4 flex justify-between items-center' key={index}>
+                    <div data-testid="assignment-card" className='border rounded-lg p-4 flex justify-between items-center' key={index}>
                       <div>
                         <p className='text-sm font-semibold'>{a?.shopName}</p>
                         <p className='text-sm text-gray-500'><span className='font-semibold'>Delivery Address:</span> {a?.deliveryAddress.text}</p>
                         <p className='text-xs text-gray-400'>{a.items.length} items | {a.subtotal}</p>
                       </div>
-                      <button className='bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600' onClick={() => acceptOrder(a.assignmentId)}>Accept</button>
+                      <button 
+                        data-testid="accept-assignment-btn"
+                        className={`bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600 ${statusUpdating ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                        onClick={() => !statusUpdating && acceptOrder(a.assignmentId)}
+                        disabled={statusUpdating}
+                      >
+                        {statusUpdating ? <ClipLoader size={14} color='white' /> : "Accept"}
+                      </button>
 
                     </div>
                   ))
-                ) : <p className='text-gray-400 text-sm'>No Available Orders</p>}
+                ) : <p data-testid="no-assignments-msg" className='text-gray-400 text-sm'>No Available Orders</p>}
             </div>
           )}
         </div>}
 
-        {currentOrder && <div className='bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100'>
+        {currentOrder && <div data-testid="current-order-section" className='bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100'>
           <h2 className='text-lg font-bold mb-3'>📦Current Order</h2>
           <div className='border rounded-lg p-4 mb-3'>
             <p className='font-semibold text-sm'>{currentOrder?.shopOrder.shop.name}</p>
@@ -284,14 +303,39 @@ function DeliveryBoy() {
               lon: currentOrder.deliveryAddress.longitude
             }
           }} />
-          {!showOtpBox ? <button className='mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200' onClick={sendOtp} disabled={loading}>
-            {loading ? <ClipLoader size={20} color='white' /> : "Mark As Delivered"}
-          </button> : <div className='mt-4 p-4 border rounded-xl bg-gray-50'>
+          
+          {currentOrder.shopOrder.status === "out of delivery" && (
+            <button 
+              className={`mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-blue-600 active:scale-95 transition-all duration-200 ${statusUpdating ? 'opacity-50' : ''}`} 
+              disabled={statusUpdating}
+              onClick={async () => {
+                if (statusUpdating) return;
+                setStatusUpdating(true)
+                try {
+                  await axios.post(`${serverUrl}/api/order/update-status/${currentOrder._id}/${currentOrder.shopOrder.shop._id}`, { status: "on_the_way" }, { withCredentials: true })
+                  await getCurrentOrder()
+                } catch (error) {
+                } finally {
+                  setStatusUpdating(false)
+                }
+              }}
+            >
+              {statusUpdating ? <ClipLoader size={20} color='white' /> : "Start Delivery (On the way)"}
+            </button>
+          )}
+
+          {currentOrder.shopOrder.status === "on_the_way" && !showOtpBox && (
+            <button data-testid="send-otp-btn" className='mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200' onClick={sendOtp} disabled={loading}>
+              {loading ? <ClipLoader size={20} color='white' /> : "Mark As Delivered"}
+            </button>
+          )}
+          
+          {showOtpBox && <div className='mt-4 p-4 border rounded-xl bg-gray-50'>
             <p className='text-sm font-semibold mb-2'>Enter Otp send to <span className='text-orange-500'>{currentOrder.user.fullName}</span></p>
-            <input type="text" className='w-full border px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-orange-400' placeholder='Enter OTP' onChange={(e) => setOtp(e.target.value)} value={otp} />
+            <input data-testid="otp-input" type="text" className='w-full border px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-orange-400' placeholder='Enter OTP' onChange={(e) => setOtp(e.target.value)} value={otp} />
             {message && <p className='text-center text-green-400 text-2xl mb-4'>{message}</p>}
 
-            <button className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-all" onClick={verifyOtp}>Submit OTP</button>
+            <button data-testid="verify-otp-btn" className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-all" onClick={verifyOtp}>Submit OTP</button>
           </div>}
 
         </div>}

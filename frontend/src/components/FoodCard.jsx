@@ -61,7 +61,7 @@ function FoodCard({ data }) {
     };
 
     return (
-        <div className='w-[260px] rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group transform hover:-translate-y-1'>
+        <div data-testid="food-card" className='w-[260px] rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group transform hover:-translate-y-1'>
             <div className='relative w-full h-[180px] bg-gray-50 overflow-hidden'>
                 <div className='absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm text-xs font-bold text-gray-700 z-10'>
                     {data.shop?.name || "Premium Shop"}
@@ -77,7 +77,7 @@ function FoodCard({ data }) {
             </div>
 
             <div className="flex-1 flex flex-col p-4">
-                <h1 className='font-bold text-gray-800 text-lg truncate mb-1'>{data.name}</h1>
+                <h1 data-testid="food-card-name" className='font-bold text-gray-800 text-lg truncate mb-1'>{data.name}</h1>
 
                 <div className='flex items-center gap-1 mb-3'>
                     <div className="flex gap-0.5">{renderStars(data.rating?.average || 0)}</div>
@@ -85,7 +85,7 @@ function FoodCard({ data }) {
                 </div>
 
                 <div className='flex items-center justify-between mt-auto pt-3 border-t border-gray-50'>
-                    <span className='font-extrabold text-[#ff4d2d] text-xl'>
+                    <span data-testid="food-card-price" className='font-extrabold text-[#ff4d2d] text-xl'>
                         ₹{data.price}
                     </span>
 
@@ -107,6 +107,7 @@ function FoodCard({ data }) {
                         )}
 
                         <button
+                            data-testid="add-to-cart-btn"
                             className={`${isInCart ? "bg-gray-800" : "bg-[#ff4d2d]"} text-white p-2.5 rounded-full shadow-lg shadow-[#ff4d2d]/30 hover:scale-110 active:scale-95 transition-all duration-300 disabled:opacity-50`}
                             onClick={handleAddToCartClick}
                             disabled={(quantity === 0 && !isInCart) || operationState.addPending}

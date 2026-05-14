@@ -140,6 +140,7 @@ function SignUp() {
                             return (
                                 <button
                                     key={r}
+                                    data-testid={`role-${r}`}
                                     type="button"
                                     className={`flex-1 rounded-lg px-2 py-2 text-center text-sm font-bold transition-all duration-300 capitalize cursor-pointer ${isActive
                                         ? `${activeClass} transform scale-100`
@@ -155,6 +156,7 @@ function SignUp() {
                 </div>
 
                 <Button
+                    data-testid="signup-submit-btn"
                     className={`w-full ${currentTheme.bg} hover:brightness-110`}
                     onClick={handleSignUp}
                     isLoading={loading}
@@ -164,7 +166,7 @@ function SignUp() {
                 </Button>
 
                 {err && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg animate-pulse">
+                    <div data-testid="signup-error-msg" className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg animate-pulse">
                         <p className='text-red-500 text-center text-sm font-medium'>*{err}</p>
                     </div>
                 )}

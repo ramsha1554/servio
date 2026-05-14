@@ -112,6 +112,7 @@ function SignIn() {
                 </div>
 
                 <Button
+                    data-testid="signin-submit-btn"
                     className="w-full"
                     onClick={handleSignIn}
                     isLoading={loading}
@@ -121,7 +122,7 @@ function SignIn() {
                 </Button>
 
                 {err && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg animate-pulse">
+                    <div data-testid="signin-error-msg" className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg animate-pulse">
                         <p className='text-red-500 text-center text-sm font-medium'>*{err}</p>
                     </div>
                 )}

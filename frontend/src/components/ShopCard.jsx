@@ -8,6 +8,7 @@ function ShopCard({ shop, onClick }) {
         
     return (
         <div
+            data-testid="shop-card"
             className='min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100 group'
             onClick={onClick}
         >
@@ -27,7 +28,7 @@ function ShopCard({ shop, onClick }) {
 
             <div className='p-4 flex flex-col gap-1'>
                 <div className="flex justify-between items-start">
-                    <h3 className='font-bold text-gray-800 text-lg leading-tight group-hover:text-[#ff4d2d] transition-colors'>
+                    <h3 data-testid="shop-card-name" className='font-bold text-gray-800 text-lg leading-tight group-hover:text-[#ff4d2d] transition-colors'>
                         {shop.name}
                     </h3>
                     <span className='text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full'>

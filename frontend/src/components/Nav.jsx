@@ -119,9 +119,9 @@ function Nav({ onCityClick }) {
                     </div>
                 </> : (
                     <>
-                        {userData?.role == "user" && <div className='relative cursor-pointer group' onClick={() => navigate("/cart")}>
+                        {userData?.role == "user" && <div data-testid="nav-cart-link" className='relative cursor-pointer group' onClick={() => navigate("/cart")}>
                             <FiShoppingCart size={24} className='text-[#ff4d2d] transition-transform group-hover:scale-110 duration-200' />
-                            {cartItems.length > 0 && <span className='absolute right-[-8px] top-[-8px] bg-[#ff4d2d] text-white text-[10px] font-bold w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm'>{cartItems.length}</span>}
+                            {cartItems.length > 0 && <span data-testid="cart-item-count" className='absolute right-[-8px] top-[-8px] bg-[#ff4d2d] text-white text-[10px] font-bold w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm'>{cartItems.length}</span>}
                         </div>}
 
                         <button className='hidden md:block px-4 py-2 rounded-full hover:bg-[#ff4d2d]/5 text-gray-600 hover:text-[#ff4d2d] text-sm font-semibold transition-colors' onClick={() => navigate("/my-orders")}>
@@ -131,7 +131,7 @@ function Nav({ onCityClick }) {
                 )}
 
                 <div className='relative'>
-                    <div className='w-[42px] h-[42px] rounded-full flex items-center justify-center bg-[#ff4d2d] text-white text-[18px] shadow-lg shadow-[#ff4d2d]/20 font-bold cursor-pointer hover:ring-4 hover:ring-[#ff4d2d]/10 transition-all duration-300' onClick={() => setShowInfo(prev => !prev)}>
+                    <div data-testid="user-avatar" className='w-[42px] h-[42px] rounded-full flex items-center justify-center bg-[#ff4d2d] text-white text-[18px] shadow-lg shadow-[#ff4d2d]/20 font-bold cursor-pointer hover:ring-4 hover:ring-[#ff4d2d]/10 transition-all duration-300' onClick={() => setShowInfo(prev => !prev)}>
                         {userData?.fullName.slice(0, 1).toUpperCase()}
                     </div>
 
@@ -143,7 +143,7 @@ function Nav({ onCityClick }) {
 
                         {userData?.role == "user" && <div className='md:hidden px-4 py-2 hover:bg-gray-50 rounded-xl text-gray-600 cursor-pointer text-sm font-medium transition-colors' onClick={() => navigate("/my-orders")}>My Orders</div>}
 
-                        <div className='px-4 py-2 hover:bg-red-50 hover:text-red-500 text-red-500 rounded-xl font-medium cursor-pointer text-sm transition-colors' onClick={handleLogOut}>Sign Out</div>
+                        <div data-testid="signout-btn" className='px-4 py-2 hover:bg-red-50 hover:text-red-500 text-red-500 rounded-xl font-medium cursor-pointer text-sm transition-colors' onClick={handleLogOut}>Sign Out</div>
                     </div>}
                 </div>
 
