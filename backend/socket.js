@@ -1,4 +1,5 @@
 import User from "./models/user.model.js"
+import Order from "./models/order.model.js"
 import logger from "./config/logger.js"
 
 export const socketHandler = (io) => {
@@ -19,7 +20,30 @@ export const socketHandler = (io) => {
       }
     });
 
-    socket.on('updateLocation', async ({ latitude, longitude, userId }) => {
+    socket.on('joinOrder', async ({ orderId, userId }) => {
+      if (orderId && userId) {
+        try {
+          const order = await Order.findById(orderId);
+          if (!order) return;
+
+          // Check if user is the customer or an assigned delivery boy
+          const isCustomer = String(order.user) === String(userId);
+          const isAssignedDriver = order.shopOrders.some(so => String(so.assignedDeliveryBoy) === String(userId));
+          
+          if (isCustomer || isAssignedDriver) {
+            socket.join(orderId);
+            logger.info("Socket joined order room", { orderId, userId, socketId: socket.id });
+          } else {
+            logger.warn("Unauthorized join attempt", { orderId, userId });
+            socket.emit('joinError', { message: "You are not authorized to track this order." });
+          }
+        } catch (error) {
+          logger.error("Socket joinOrder error", { error: error.message });
+        }
+      }
+    });
+
+    socket.on('updateLocation', async ({ latitude, longitude, userId, orderId }) => {
       try {
         if (!latitude || !longitude || !userId) return;
 
@@ -32,8 +56,9 @@ export const socketHandler = (io) => {
           socketId: socket.id
         }, { new: true });
 
-        if (user && user.role === 'deliveryBoy') {
-          io.emit('updateDeliveryLocation', {
+        if (user && user.role === 'deliveryBoy' && orderId) {
+          // Emit only to the specific order room
+          io.to(orderId).emit('deliveryLocationUpdate', {
             deliveryBoyId: userId,
             latitude,
             longitude
