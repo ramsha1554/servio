@@ -40,7 +40,7 @@ const Shops = () => {
       </header>
 
       <div className="p-8">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div data-testid="admin-shops-list" className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500 font-semibold">
@@ -88,6 +88,7 @@ const Shops = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
+                        data-testid="verify-shop-btn"
                         onClick={() => toggleVerify.mutate(shop._id)}
                         className={`p-1.5 rounded-lg transition-colors ${
                           shop.isVerified 
@@ -96,7 +97,7 @@ const Shops = () => {
                         }`}
                         title={shop.isVerified ? "Revoke Verification" : "Verify Shop"}
                       >
-                        {shop.isVerified ? <XCircle size={18} /> : <CheckCircle size={18} />}
+                        {shop.isVerified ? "Revoke" : "Verify"}
                       </button>
                       <button 
                         onClick={() => {

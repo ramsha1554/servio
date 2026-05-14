@@ -86,7 +86,7 @@ const Users = () => {
 
       {/* TABLE */}
       <div className="p-8">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div data-testid="admin-users-list" className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500 font-semibold">
@@ -138,13 +138,14 @@ const Users = () => {
                     </td>
                     <td className="px-6 py-4 flex items-center justify-end gap-2 relative opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
+                        data-testid="ban-user-btn"
                         onClick={() => handleToggleBan(user._id)}
                         className={`p-1.5 rounded-lg transition-colors ${
                           user.isBanned ? "text-green-600 hover:bg-green-50" : "text-red-600 hover:bg-red-50"
                         }`}
                         title={user.isBanned ? "Unban User" : "Ban User"}
                       >
-                        {user.isBanned ? <Check size={18} /> : <X size={18} />}
+                        {user.isBanned ? "Unban" : "Ban"}
                       </button>
                       
                       <div className="relative">

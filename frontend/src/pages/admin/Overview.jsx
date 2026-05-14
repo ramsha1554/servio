@@ -129,7 +129,7 @@ const Overview = () => {
       <div className="p-8 space-y-8">
         
         {/* STAT CARDS */}
-        <div className="grid grid-cols-4 gap-4">
+        <div data-testid="admin-stats-section" className="grid grid-cols-4 gap-4">
           {/* Revenue */}
           <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
             <div className="flex justify-between items-start mb-2">

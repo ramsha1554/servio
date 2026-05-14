@@ -48,7 +48,9 @@ const Orders = () => {
       case 'pending': return 'bg-red-100 text-red-800';
       case 'preparing': return 'bg-yellow-100 text-yellow-800';
       case 'out of delivery': return 'bg-blue-100 text-blue-800';
+      case 'on_the_way': return 'bg-indigo-100 text-indigo-800';
       case 'delivered': return 'bg-green-100 text-green-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -73,7 +75,7 @@ const Orders = () => {
       </header>
 
       <div className="p-8">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div data-testid="admin-orders-list" className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500 font-semibold">
