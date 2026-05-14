@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import { TbCurrentLocation } from "react-icons/tb";
 import { IoLocationSharp } from "react-icons/io5";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { setAddress, setLocation } from '../redux/mapSlice';
 import { MdDeliveryDining } from "react-icons/md";
@@ -140,7 +140,7 @@ function CheckOut() {
         }))
       }
 
-      const result = await axios.post(`${serverUrl}/api/order/place-order`, orderPayload, { withCredentials: true })
+      await axios.post(`${serverUrl}/api/order/place-order`, orderPayload, { withCredentials: true })
 
       if (paymentMethod == "cod") {
         dispatch(addMyOrder(result.data))
@@ -168,7 +168,7 @@ function CheckOut() {
       order_id: razorOrder.id,
       handler: async function (response) {
         try {
-          const result = await axios.post(`${serverUrl}/api/order/verify-payment`, {
+          await axios.post(`${serverUrl}/api/order/verify-payment`, {
             razorpay_payment_id: response.razorpay_payment_id,
             orderId
           }, { withCredentials: true })

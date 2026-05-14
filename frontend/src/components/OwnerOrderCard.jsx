@@ -5,7 +5,7 @@ import { serverUrl } from '../App';
 import { useDispatch } from 'react-redux';
 import { updateOrderStatus } from '../redux/userSlice';
 import { useState } from 'react';
-import { useEffect } from 'react';
+
 function OwnerOrderCard({ data }) {
     const [availableBoys, setAvailableBoys] = useState([])
     const dispatch = useDispatch()
@@ -47,7 +47,7 @@ function OwnerOrderCard({ data }) {
 
             <div className='flex space-x-4 overflow-x-auto pb-2'>
                 {data.shopOrders.shopOrderItems.map((item, index) => (
-                    <div key={index} className='flex-shrink-0 w-40 border rounded-lg p-2 bg-white"'>
+                    <div key={index} className='flex-shrink-0 w-40 border rounded-lg p-2 bg-white'>
                         <img src={item.item.image} alt="" className='w-full h-24 object-cover rounded' />
                         <p className='text-sm font-semibold mt-1'>{item.name}</p>
                         <p className='text-xs text-gray-500'>Qty: {item.quantity} x ₹{item.price}</p>
@@ -72,8 +72,8 @@ function OwnerOrderCard({ data }) {
                 <div className="mt-3 p-2 border rounded-lg text-sm bg-orange-50 gap-4">
                     {data.shopOrders.assignedDeliveryBoy ? <p>Assigned Delivery Boy:</p> : <p>Available Delivery Boys:</p>}
                     {availableBoys?.length > 0 ? (
-                        availableBoys.map((b, index) => (
-                            <div className='text-gray-800'>{b.fullName}-{b.mobile}</div>
+                        availableBoys.map((b) => (
+                            <div key={b._id} className='text-gray-800'>{b.fullName}-{b.mobile}</div>
                         ))
                     ) : data.shopOrders.assignedDeliveryBoy ? <div>{data.shopOrders.assignedDeliveryBoy.fullName}-{data.shopOrders.assignedDeliveryBoy.mobile}</div> : <div>Waiting for delivery boy to accept</div>}
                 </div>}

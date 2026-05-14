@@ -12,7 +12,7 @@ function CartPage() {
     const dispatch = useDispatch()
     
     // Connect to the new domain-separated cart slice
-    const { items, status, recovery, operationState } = useSelector(state => state.cart)
+    const { items, status, operationState } = useSelector(state => state.cart)
 
     useEffect(() => {
         dispatch(revalidateCartPrices());

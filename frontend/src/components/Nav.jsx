@@ -12,7 +12,8 @@ import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 
 function Nav({ onCityClick }) {
-    const { userData, currentCity, cartItems } = useSelector(state => state.user)
+    const { userData, currentCity } = useSelector(state => state.user)
+    const { items: cartItems } = useSelector(state => state.cart)
     const { myShopData } = useSelector(state => state.owner)
     const [showInfo, setShowInfo] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
@@ -30,14 +31,14 @@ function Nav({ onCityClick }) {
         }
     }
 
-    const handleSearchItems = async () => {
+    const handleSearchItems = React.useCallback(async () => {
         try {
             const result = await axios.get(`${serverUrl}/api/item/search-items?query=${query}&city=${currentCity}`, { withCredentials: true })
             dispatch(setSearchItems(result.data))
         } catch (error) {
             console.log(error)
         }
-    }
+    }, [query, currentCity, dispatch]);
 
     useEffect(() => {
         if (query) {
@@ -46,7 +47,7 @@ function Nav({ onCityClick }) {
             dispatch(setSearchItems(null))
         }
 
-    }, [query])
+    }, [query, handleSearchItems, dispatch])
 
     return (
         <div className='w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] border-b border-gray-100 overflow-visible transition-all duration-300'>
