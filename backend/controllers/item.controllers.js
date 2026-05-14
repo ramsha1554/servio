@@ -253,6 +253,19 @@ export const searchItems = async (req, res) => {
 }
 
 
+export const getBulkItems = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ message: "Invalid IDs provided" });
+        }
+        const items = await Item.find({ _id: { $in: ids } }).select("name price shop image");
+        return res.status(200).json(items);
+    } catch (error) {
+        return res.status(500).json({ message: `Bulk get error: ${error.message}` });
+    }
+}
+
 export const rating = async (req, res) => {
     try {
         const { itemId, rating } = req.body

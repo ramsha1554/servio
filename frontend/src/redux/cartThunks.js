@@ -5,9 +5,56 @@ import {
     setPendingItem,
     resetPendingItem,
     addItemRaw,
-    clearCart
+    clearCart,
+    removeItemRaw,
+    resolveRecovery
 } from './cartSlice';
 import { calculateDistance, isWithinCluster } from '../utils/geoUtils';
+import axios from 'axios';
+import { serverUrl } from '../App';
+
+/**
+ * Revalidate cart item prices and availability against the Database.
+ */
+export const revalidateCartPrices = () => async (dispatch, getState) => {
+    const { items } = getState().cart;
+    if (items.length === 0) return;
+
+    dispatch(setOperationState({ hydrationPending: true }));
+    try {
+        const ids = items.map(i => i.id || i._id);
+        const response = await axios.post(`${serverUrl}/api/item/get-bulk`, { ids }, { withCredentials: true });
+        const dbItems = response.data;
+        const dbItemMap = new Map(dbItems.map(item => [item._id.toString(), item]));
+
+        const updatedItems = items.map(item => {
+            const dbItem = dbItemMap.get(item.id || item._id);
+            if (!dbItem) return null; // Flag for removal
+            
+            return {
+                ...item,
+                price: dbItem.price,
+                name: dbItem.name,
+                image: dbItem.image
+            };
+        }).filter(Boolean);
+
+        if (updatedItems.length !== items.length) {
+            // Some items were removed from DB
+            dispatch(setCart({ items: updatedItems, timestamp: Date.now() }));
+        } else {
+            // Check if any prices changed
+            const hasChanges = updatedItems.some((item, index) => item.price !== items[index].price);
+            if (hasChanges) {
+                dispatch(setCart({ items: updatedItems, timestamp: Date.now() }));
+            }
+        }
+    } catch (error) {
+        console.error("Cart revalidation failed:", error);
+    } finally {
+        dispatch(setOperationState({ hydrationPending: false }));
+    }
+};
 
 /**
  * The Authoritative Orchestration Thunk for adding items to the cart.

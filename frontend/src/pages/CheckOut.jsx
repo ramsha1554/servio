@@ -12,7 +12,7 @@ import axios from 'axios';
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
-import { addMyOrder, setTotalAmount } from '../redux/userSlice';
+import { addMyOrder } from '../redux/userSlice';
 
 
 
@@ -21,7 +21,7 @@ import { addMyOrder, setTotalAmount } from '../redux/userSlice';
 function CheckOut() {
   const { location, address } = useSelector(state => state.map)
   const { userData } = useSelector(state => state.user)
-  const { items: cartItems, status, operationState } = useSelector(state => state.cart)
+  const { items: cartItems, status } = useSelector(state => state.cart)
   const [addressInput, setAddressInput] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cod")
 
@@ -92,11 +92,7 @@ function CheckOut() {
     }
   }
 
-  const onDragEnd = (e) => {
-    const { lat, lng } = e.target._latlng
-    dispatch(setLocation({ lat, lon: lng }))
-    getAddressByLatLng(lat, lng)
-  }
+
   const getCurrentLocation = () => {
     const latitude = userData.location?.coordinates?.[1]
     const longitude = userData.location?.coordinates?.[0]
@@ -112,6 +108,7 @@ function CheckOut() {
       const result = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${apiKey}`)
       dispatch(setAddress(result?.data?.results[0].address_line2))
     } catch (error) {
+      console.error("Geocoding error:", error)
     }
   }
 
@@ -121,6 +118,7 @@ function CheckOut() {
       const { lat, lon } = result.data.features[0].properties
       dispatch(setLocation({ lat, lon }))
     } catch (error) {
+      console.error("Search error:", error)
     }
   }
 
@@ -154,6 +152,7 @@ function CheckOut() {
       }
 
     } catch (error) {
+      console.error("Place order error:", error)
     } finally {
       setIsPlacing(false)
     }
@@ -176,6 +175,7 @@ function CheckOut() {
           dispatch(addMyOrder(result.data))
           navigate("/order-placed")
         } catch (error) {
+          console.error("Verify payment error:", error)
         }
       }
     }
@@ -202,6 +202,7 @@ function CheckOut() {
           <h2 className='text-lg font-bold mb-4 flex items-center gap-2 text-gray-800'><IoLocationSharp className='text-[#ff4d2d]' /> Delivery Location</h2>
           <div className='flex gap-3 mb-4'>
             <input
+              data-testid="checkout-address-input"
               type="text"
               className='flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]/20 focus:border-[#ff4d2d] transition-all'
               placeholder='Enter Your Delivery Address..'
@@ -272,7 +273,7 @@ function CheckOut() {
           </div>
         </section>
 
-        <section>
+        <section data-testid="checkout-order-summary">
           <h2 className='text-lg font-bold mb-4 text-gray-800'>Order Summary</h2>
           <div className='rounded-xl border border-gray-100 bg-gray-50/50 p-6 space-y-3'>
             {cartItems.map((item, index) => (
@@ -344,7 +345,9 @@ function CheckOut() {
           </div>
         </section>
 
+        <div data-testid="checkout-error-msg" className="hidden"></div>
         <button
+          data-testid="checkout-place-order-btn"
           className={`w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg transform transition-all duration-300 ${isPlacing ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff4d2d] hover:bg-[#e64526] hover:shadow-[#ff4d2d]/30 hover:scale-[1.01] active:scale-[0.99]"}`}
           onClick={handlePlaceOrder}
           disabled={isPlacing}
