@@ -18,3 +18,7 @@ Thumbs.db
 # editor
 .vscode/
 .idea/
+
+# testing
+playwright-report/
+test-results/
