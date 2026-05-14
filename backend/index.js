@@ -117,6 +117,7 @@ import itemRouter from "./routes/item.routes.js"
 import shopRouter from "./routes/shop.routes.js"
 import orderRouter from "./routes/order.routes.js"
 import adminRouter from "./routes/admin.routes.js"
+import testRouter from "./routes/test.routes.js"
 import http from "http"
 import { Server } from "socket.io"
 import { socketHandler } from "./socket.js"
@@ -154,8 +155,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,
-        sameSite: "none",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         httpOnly: true
     }
 }));
@@ -180,6 +181,8 @@ app.use((req, res, next) => {
     next()
 })
 
+app.use(helmet())
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 500,
@@ -198,12 +201,13 @@ app.use(limiter)
 
 app.use(express.json())
 app.use(cookieParser())
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authLimiter, authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/shop", shopRouter)
 app.use("/api/item", itemRouter)
 app.use("/api/order", orderRouter)
 app.use("/api/admin", adminRouter)
+app.use("/api/test", testRouter)
 
 socketHandler(io)
 server.listen(port, () => {

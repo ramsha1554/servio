@@ -289,8 +289,8 @@ export const signUp = async (req, res) => {
         const token = await genToken(user._id)
         
         res.cookie("token", token, {
-            secure: true,
-            sameSite: "none",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             path: "/"
@@ -338,8 +338,8 @@ export const signIn = async (req, res) => {
         const token = await genToken(user._id)
 
         res.cookie("token", token, {
-            secure: true,
-            sameSite: "none",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             path: "/"
@@ -363,8 +363,8 @@ export const signIn = async (req, res) => {
 export const signOut = async (req, res) => {
     try {
         res.clearCookie("token", {
-            secure: true,
-            sameSite: "none",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             httpOnly: true,
             path: "/"
         })
@@ -457,8 +457,8 @@ export const googleCallback = async (req, res) => {
         
         // Use a more robust cookie configuration for cross-domain (Render to Vercel)
         res.cookie("token", token, {
-            secure: true, 
-            sameSite: "none",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             path: "/" 
