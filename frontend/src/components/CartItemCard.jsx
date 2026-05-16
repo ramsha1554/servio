@@ -1,6 +1,8 @@
 import { useDispatch } from 'react-redux';
 import { removeItemWithRevalidation } from '../redux/cartThunks';
 import { updateQuantityRaw } from '../redux/cartSlice';
+import { FaMinus, FaPlus } from 'react-icons/fa';
+import { CiTrash } from 'react-icons/ci';
 
 function CartItemCard({ data }) {
     const dispatch = useDispatch()
@@ -18,12 +20,12 @@ function CartItemCard({ data }) {
     return (
         <div data-testid="cart-item-card" className='flex items-center justify-between bg-white p-4 rounded-xl shadow border hover:shadow-md transition-shadow'>
             <div className='flex items-center gap-4'>
-                <img src={data.image} alt={data.name} className='w-20 h-20 object-cover rounded-lg border' />
+                <img src={data?.image || 'https://via.placeholder.com/150'} alt={data?.name || 'Item'} className='w-20 h-20 object-cover rounded-lg border' />
                 <div>
-                    <h1 className='font-medium text-gray-800'>{data.name}</h1>
-                    <p className='text-[10px] text-gray-400 font-bold uppercase tracking-tighter mb-1'>{data.shop?.name}</p>
-                    <p className='text-sm text-gray-500'>₹{data.price} x {data.quantity}</p>
-                    <p data-testid="cart-item-total" className="font-bold text-[#ff4d2d]">₹{data.price * data.quantity}</p>
+                    <h1 className='font-medium text-gray-800'>{data?.name || 'Unknown Item'}</h1>
+                    <p className='text-[10px] text-gray-400 font-bold uppercase tracking-tighter mb-1'>{data?.shop?.name || 'Unknown Shop'}</p>
+                    <p className='text-sm text-gray-500'>₹{data?.price || 0} x {data?.quantity || 0}</p>
+                    <p data-testid="cart-item-total" className="font-bold text-[#ff4d2d]">₹{(data?.price || 0) * (data?.quantity || 0)}</p>
                 </div>
             </div>
             <div className='flex items-center gap-3'>

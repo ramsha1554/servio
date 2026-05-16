@@ -20,7 +20,7 @@ function CartPage() {
 
     // Memoize total amount calculation
     const totalAmount = useMemo(() => {
-        return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        return (items || []).reduce((sum, item) => sum + ((item?.price || 0) * (item?.quantity || 0)), 0);
     }, [items]);
 
     const isRecoveryRequired = status === 'RECOVERY_REQUIRED';
