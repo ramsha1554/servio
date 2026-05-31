@@ -142,14 +142,14 @@ function CheckOut() {
         }))
       }
 
-      await axios.post(`${serverUrl}/api/order/place-order`, orderPayload, { withCredentials: true })
+      const placeRes = await axios.post(`${serverUrl}/api/order/place-order`, orderPayload, { withCredentials: true })
 
       if (paymentMethod == "cod") {
-        dispatch(addMyOrder(result.data))
+        dispatch(addMyOrder(placeRes.data))
         navigate("/order-placed")
       } else {
-        const orderId = result.data.orderId
-        const razorOrder = result.data.razorOrder
+        const orderId = placeRes.data.orderId
+        const razorOrder = placeRes.data.razorOrder
         openRazorpayWindow(orderId, razorOrder)
       }
 
@@ -170,18 +170,39 @@ function CheckOut() {
       order_id: razorOrder.id,
       handler: async function (response) {
         try {
-          await axios.post(`${serverUrl}/api/order/verify-payment`, {
-            razorpay_payment_id: response.razorpay_payment_id,
-            orderId
-          }, { withCredentials: true })
-          dispatch(addMyOrder(result.data))
+          // Defensive: Razorpay should always include this on successful payments
+          if (!response?.razorpay_payment_id) {
+            console.error('Razorpay handler missing razorpay_payment_id:', response)
+            // Optionally show UI feedback (keeping scope minimal)
+            return;
+          }
+
+          const verifyRes = await axios.post(
+            `${serverUrl}/api/order/verify-payment`,
+            {
+              razorpay_payment_id: response.razorpay_payment_id,
+              orderId,
+            },
+            { withCredentials: true }
+          )
+
+          dispatch(addMyOrder(verifyRes.data))
           navigate("/order-placed")
         } catch (error) {
           console.error("Verify payment error:", error)
         }
-      }
+      },
     }
+
     const rzp = new window.Razorpay(options)
+
+    // Explicit failure handling (prevents silent crashes)
+    rzp.on('payment.failed', function (failureResponse) {
+      console.error('Razorpay payment failed:', failureResponse)
+      // Minimal UI impact: avoid blocking navigation by crashing
+      // You can replace this with a toast/inline message later.
+    })
+
     rzp.open()
   }
 
