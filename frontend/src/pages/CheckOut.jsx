@@ -17,6 +17,7 @@ function CheckOut() {
   const { location, address } = useSelector(state => state.map)
   const { userData } = useSelector(state => state.user)
   const { items: cartItems, status } = useSelector(state => state.cart)
+
   const [addressInput, setAddressInput] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cod")
 
@@ -29,7 +30,7 @@ function CheckOut() {
   const [deliveryDiscount, setDeliveryDiscount] = useState(false)
   const [isPlacing, setIsPlacing] = useState(false)
   const [checkoutError, setCheckoutError] = useState("")
-
+  const [locationError, setLocationError] = useState("")
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -83,31 +84,122 @@ function CheckOut() {
   }
 
   const getCurrentLocation = () => {
-    const latitude = userData.location?.coordinates?.[1]
-    const longitude = userData.location?.coordinates?.[0]
+    setLocationError("")
 
-    if (latitude && longitude) {
+    const coords = userData?.location?.coordinates
+    const latitude = Array.isArray(coords) ? coords?.[1] : undefined
+    const longitude = Array.isArray(coords) ? coords?.[0] : undefined
+
+    const hasValidLatLon =
+      typeof latitude === "number" &&
+      Number.isFinite(latitude) &&
+      typeof longitude === "number" &&
+      Number.isFinite(longitude)
+
+    if (hasValidLatLon) {
       dispatch(setLocation({ lat: latitude, lon: longitude }))
       getAddressByLatLng(latitude, longitude)
+      return
     }
+
+    // Fallback to device GPS if userData location is missing/invalid
+    if (!navigator?.geolocation?.getCurrentPosition) {
+      setLocationError("Could not access your device location. Please search manually.")
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos?.coords?.latitude
+        const lon = pos?.coords?.longitude
+
+        if (typeof lat !== "number" || typeof lon !== "number" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+          setLocationError("Could not access your device location. Please search manually.")
+          return
+        }
+
+        dispatch(setLocation({ lat, lon }))
+        setLocationError("")
+        getAddressByLatLng(lat, lon)
+      },
+      (err) => {
+        console.error("Geolocation error:", err)
+        setLocationError("Could not access your device location. Please search manually.")
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    )
   }
 
   const getAddressByLatLng = async (lat, lng) => {
+    setLocationError("")
+
     try {
-      const result = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${apiKey}`)
-      dispatch(setAddress(result?.data?.results[0].address_line2))
+      if (!apiKey) {
+        console.error("Missing VITE_GEOAPIKEY")
+        setLocationError("Location service is not available. Please try again later.")
+        return
+      }
+
+      const result = await axios.get(
+        `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${apiKey}`
+      )
+
+      const results = result?.data?.results
+      if (!Array.isArray(results) || results.length === 0) {
+        dispatch(setAddress(`${lat}, ${lng}`))
+        return
+      }
+
+      const first = results[0] || {}
+      const addressLine2 = first?.address_line2
+      const addressLine1 = first?.address_line1
+
+      dispatch(setAddress(addressLine2 || addressLine1 || `${lat}, ${lng}`))
+      setLocationError("")
     } catch (error) {
       console.error("Geocoding error:", error)
+      setLocationError("Could not resolve address for the selected location. Please search manually.")
     }
   }
 
   const getLatLngByAddress = async () => {
+    setLocationError("")
+
     try {
-      const result = await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(addressInput)}&apiKey=${apiKey}`)
-      const { lat, lon } = result.data.features[0].properties
+      if (!apiKey) {
+        console.error("Missing VITE_GEOAPIKEY")
+        setLocationError("Location service is not available. Please try again later.")
+        return
+      }
+
+      const result = await axios.get(
+        `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(addressInput)}&apiKey=${apiKey}`
+      )
+
+      console.log("Geoapify search response:", result?.data)
+
+      const features = result?.data?.features
+      if (!Array.isArray(features) || features.length === 0) {
+        setLocationError("No location found for this address, please try a different search")
+        return
+      }
+
+      const properties = features?.[0]?.properties
+      const lat = properties?.lat ?? properties?.latitude
+      const lon = properties?.lon ?? properties?.longitude
+
+      if (typeof lat !== "number" || typeof lon !== "number" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+        setLocationError("No location found for this address, please try a different search")
+        return
+      }
+
       dispatch(setLocation({ lat, lon }))
+      setLocationError("")
+      getAddressByLatLng(lat, lon)
     } catch (error) {
       console.error("Search error:", error)
+      // Surface meaningful message to user
+      setLocationError("Search failed. Please try a different address.")
     }
   }
 
@@ -282,7 +374,7 @@ function CheckOut() {
 
         <section>
           <h2 className='text-lg font-bold mb-4 flex items-center gap-2 text-gray-800'><IoLocationSharp className='text-[#ff4d2d]' /> Delivery Location</h2>
-          <div className='flex gap-3 mb-4'>
+          <div className='flex gap-3 mb-2'>
             <input
               data-testid="checkout-address-input"
               type="text"
@@ -294,6 +386,13 @@ function CheckOut() {
             <button className='bg-[#ff4d2d] hover:bg-[#e64526] text-white px-4 py-2 rounded-xl flex items-center justify-center transition-colors shadow-md hover:shadow-lg' onClick={getLatLngByAddress}><IoSearchOutline size={20} /></button>
             <button className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center transition-colors shadow-md hover:shadow-lg' onClick={getCurrentLocation}><TbCurrentLocation size={20} /></button>
           </div>
+
+          {locationError && (
+            <div className='mb-4 text-sm text-red-600 font-medium' data-testid="checkout-location-error-msg">
+              {locationError}
+            </div>
+          )}
+
           <div className='rounded-xl border border-gray-200 overflow-hidden shadow-inner h-72'>
             {location?.lat && location?.lon ? (
               <iframe
@@ -444,3 +543,4 @@ function CheckOut() {
 }
 
 export default CheckOut
+
