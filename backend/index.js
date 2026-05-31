@@ -102,72 +102,81 @@ server.listen(port, () => {
 */
 // =========================================================================
 
-import express from "express"
-import session from "express-session"
-import passport from "./config/passport.js"
-import dotenv from "dotenv"
-dotenv.config()
-import connectDb from "./config/db.js"
-import cookieParser from "cookie-parser"
-import authRouter from "./routes/auth.routes.js"
-import cors from "cors"
-import userRouter from "./routes/user.routes.js"
+import express from "express";
+import session from "express-session";
+import passport from "./config/passport.js";
+import dotenv from "dotenv";
+dotenv.config();
+import connectDb from "./config/db.js";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.routes.js";
+import cors from "cors";
+import userRouter from "./routes/user.routes.js";
 
-import itemRouter from "./routes/item.routes.js"
-import shopRouter from "./routes/shop.routes.js"
-import orderRouter from "./routes/order.routes.js"
-import adminRouter from "./routes/admin.routes.js"
-import testRouter from "./routes/test.routes.js"
-import http from "http"
-import { Server } from "socket.io"
-import { socketHandler } from "./socket.js"
-import "./workers/email.worker.js" 
-import helmet from "helmet"
-import rateLimit from "express-rate-limit"
-import logger from "./config/logger.js"
+import itemRouter from "./routes/item.routes.js";
+import shopRouter from "./routes/shop.routes.js";
+import orderRouter from "./routes/order.routes.js";
+import adminRouter from "./routes/admin.routes.js";
+import testRouter from "./routes/test.routes.js";
+import http from "http";
+import { Server } from "socket.io";
+import { socketHandler } from "./socket.js";
+import "./workers/email.worker.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import logger from "./config/logger.js";
 
-const app = express()
-app.set('trust proxy', 1)
-const server = http.createServer(app)
+const app = express();
+app.set("trust proxy", 1);
+const server = http.createServer(app);
+
+const vercelOrigin = "https://servio-livid.vercel.app";
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(",")
-    : ["http://localhost:5173", "https://servio-livid.vercel.app"];
+  ? [...process.env.ALLOWED_ORIGINS.split(","), vercelOrigin]
+  : ["http://localhost:5173", vercelOrigin];
 
 const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(null, false);
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+  ],
 };
 
 app.use(cors(corsOptions));
 
 // Session is required for Passport OAuth flow state
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'servio_secret',
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "servio_secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        httpOnly: true
-    }
-}));
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      httpOnly: true,
+    },
+  }),
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 const io = new Server(server, {
-    cors: corsOptions,
-    allowEIO3: true,
-    transports: ['websocket', 'polling']
+  cors: corsOptions,
+  allowEIO3: true,
+  transports: ["websocket", "polling"],
 });
 
 app.set("io", io);
@@ -175,42 +184,42 @@ app.set("io", io);
 const port = process.env.PORT || 8000;
 
 app.use((req, res, next) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff')
-    res.setHeader('X-Frame-Options', 'DENY')
-    res.setHeader('X-XSS-Protection', '1; mode=block')
-    next()
-})
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
 
-app.use(helmet())
+app.use(helmet());
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 500,
-    standardHeaders: true,
-    legacyHeaders: false,
-})
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    standardHeaders: true,
-    legacyHeaders: false,
-})
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-app.use(limiter)
+app.use(limiter);
 
-app.use(express.json())
-app.use(cookieParser())
-app.use("/api/auth", authLimiter, authRouter)
-app.use("/api/user", userRouter)
-app.use("/api/shop", shopRouter)
-app.use("/api/item", itemRouter)
-app.use("/api/order", orderRouter)
-app.use("/api/admin", adminRouter)
-app.use("/api/test", testRouter)
+app.use(express.json());
+app.use(cookieParser());
+app.use("/api/auth", authLimiter, authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/shop", shopRouter);
+app.use("/api/item", itemRouter);
+app.use("/api/order", orderRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/test", testRouter);
 
-socketHandler(io)
+socketHandler(io);
 server.listen(port, () => {
-    connectDb()
-    logger.info(`Server started at port ${port}`)
-})
+  connectDb();
+  logger.info(`Server started at port ${port}`);
+});

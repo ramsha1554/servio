@@ -14,10 +14,15 @@ export const SocketProvider = ({ children }) => {
     const { userData } = useSelector(state => state.user);
 
     useEffect(() => {
-        const socketInstance = io(serverUrl, { 
+        const socketInstance = io(serverUrl, {
             withCredentials: true,
-            transports: ["websocket", "polling"]
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            timeout: 20000
         });
+
         setSocket(socketInstance);
 
         socketInstance.on('connect', () => {

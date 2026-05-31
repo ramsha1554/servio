@@ -28,6 +28,8 @@ function CheckOut() {
   const [couponMsg, setCouponMsg] = useState("")
   const [deliveryDiscount, setDeliveryDiscount] = useState(false)
   const [isPlacing, setIsPlacing] = useState(false)
+  const [checkoutError, setCheckoutError] = useState("")
+
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -111,23 +113,90 @@ function CheckOut() {
 
   const handlePlaceOrder = async () => {
     if (isPlacing || status !== 'ACTIVE') return;
+
+    setCheckoutError("")
     setIsPlacing(true)
     try {
+      // --- Frontend validation to avoid Zod 400 ---
+      if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+        setCheckoutError("Your cart is empty.")
+        return
+      }
+
+      const hasCoords =
+        location &&
+        typeof location.lat === "number" &&
+        Number.isFinite(location.lat) &&
+        typeof location.lon === "number" &&
+        Number.isFinite(location.lon)
+
+      const hasAddress = typeof addressInput === "string" && addressInput.trim().length >= 5
+
+      if (!hasAddress) {
+        setCheckoutError("Please enter a valid delivery address (min 5 characters).")
+        return
+      }
+
+      if (!hasCoords) {
+        setCheckoutError("Please select a delivery location on the map.")
+        return
+      }
+
+      if (!["cod", "online"].includes(paymentMethod)) {
+        setCheckoutError("Please select a valid payment method.")
+        return
+      }
+
+      // --- Normalize payload shape for backend Zod ---
+      const normalizedCartItems = cartItems.map((item) => {
+        const id = item?.id || item?._id
+        const shopId = typeof item?.shop === "object" ? item?.shop?._id : item?.shop
+
+        return {
+          ...item,
+          id: String(id),
+          shop: String(shopId),
+          price: Number(item?.price),
+          quantity: Number(item?.quantity),
+          name: String(item?.name ?? "")
+        }
+      })
+
+      const invalid = normalizedCartItems.some((i) => {
+        return (
+          !i.shop ||
+          !i.id ||
+          !Number.isFinite(i.price) ||
+          !Number.isFinite(i.quantity) ||
+          i.quantity < 1 ||
+          !i.name
+        )
+      })
+
+      if (invalid) {
+        setCheckoutError("Some cart items are invalid. Please refresh your cart and try again.")
+        return
+      }
+
       const orderPayload = {
         paymentMethod,
         deliveryAddress: {
-          text: addressInput,
+          text: addressInput.trim(),
           latitude: location.lat,
           longitude: location.lon
         },
-        totalAmount: finalTotal,
-        cartItems: cartItems.map(item => ({
-          ...item,
-          shop: typeof item.shop === 'object' ? item.shop._id : item.shop
+        totalAmount: Number(finalTotal),
+        cartItems: normalizedCartItems.map(({ shop, id, price, quantity, name }) => ({
+          shop,
+          id,
+          price,
+          quantity,
+          name
         }))
       }
 
       const placeRes = await axios.post(`${serverUrl}/api/order/place-order`, orderPayload, { withCredentials: true })
+      setCheckoutError("")
 
       if (paymentMethod == "cod") {
         dispatch(addMyOrder(placeRes.data))
@@ -140,10 +209,12 @@ function CheckOut() {
 
     } catch (error) {
       console.error("Place order error:", error)
+      setCheckoutError("Order placement failed. Please try again.")
     } finally {
       setIsPlacing(false)
     }
   }
+
 
   const openRazorpayWindow = (orderId, razorOrder) => {
     const options = {
@@ -354,7 +425,10 @@ function CheckOut() {
           </div>
         </section>
 
-        <div data-testid="checkout-error-msg" className="hidden"></div>
+        <div data-testid="checkout-error-msg" className={checkoutError ? "" : "hidden"}>
+          {checkoutError}
+        </div>
+
         <button
           data-testid="checkout-place-order-btn"
           className={`w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg transform transition-all duration-300 ${isPlacing ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff4d2d] hover:bg-[#e64526] hover:shadow-[#ff4d2d]/30 hover:scale-[1.01] active:scale-[0.99]"}`}
