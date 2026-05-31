@@ -9,7 +9,7 @@
     "seed:prod": "node utils/seeder/productionSeeder.js",
     "seed:reset": "node utils/seeder/productionSeeder.js --reset"
   },
-  "author": "",
+  "author": "Ramsha",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",
