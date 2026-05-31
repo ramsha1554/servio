@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react'
-
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { IoSearchOutline } from "react-icons/io5";
 import { TbCurrentLocation } from "react-icons/tb";
 import { IoLocationSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
-
-
 import { setAddress, setLocation } from '../redux/mapSlice';
 import { MdDeliveryDining } from "react-icons/md";
 import { FaCreditCard } from "react-icons/fa";
@@ -15,7 +12,6 @@ import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
 import { addMyOrder } from '../redux/userSlice';
-
 
 function CheckOut() {
   const { location, address } = useSelector(state => state.map)
@@ -158,9 +154,9 @@ function CheckOut() {
       description: "Food Delivery Website",
       order_id: razorOrder.id,
       prefill: {
-        name: "",
-        email: "",
-        contact: ""
+        name: "Test User",
+        email: "test@servio.com",
+        contact: "9999999999"
       },
       theme: {
         color: "#ff4d2d"
