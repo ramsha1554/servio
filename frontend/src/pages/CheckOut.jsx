@@ -17,9 +17,6 @@ import { serverUrl } from '../App';
 import { addMyOrder } from '../redux/userSlice';
 
 
-
-
-
 function CheckOut() {
   const { location, address } = useSelector(state => state.map)
   const { userData } = useSelector(state => state.user)
@@ -27,40 +24,35 @@ function CheckOut() {
   const [addressInput, setAddressInput] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cod")
 
-  // Calculate Total locally from the domain-separated cart
   const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Coupon States
   const [promoCode, setPromoCode] = useState("")
   const [appliedDiscount, setAppliedDiscount] = useState(0)
   const [discountLabel, setDiscountLabel] = useState("")
   const [couponMsg, setCouponMsg] = useState("")
-  const [deliveryDiscount, setDeliveryDiscount] = useState(false) // For Free Delivery
+  const [deliveryDiscount, setDeliveryDiscount] = useState(false)
   const [isPlacing, setIsPlacing] = useState(false)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const apiKey = import.meta.env.VITE_GEOAPIKEY
 
-  // Hard Check: Redirect if cart is invalid or empty
   useEffect(() => {
     if (status === 'EMPTY' || status === 'RECOVERY_REQUIRED') {
       navigate('/cart');
     }
   }, [status, navigate]);
 
-  // Calculate Fees
   const deliveryFee = totalAmount > 500 ? 0 : 40
   const effectiveDeliveryFee = deliveryDiscount ? 0 : deliveryFee
   const AmountWithDeliveryFee = totalAmount + effectiveDeliveryFee
-  const finalTotal = Math.max(0, AmountWithDeliveryFee - appliedDiscount) // Ensure non-negative
+  const finalTotal = Math.max(0, AmountWithDeliveryFee - appliedDiscount)
 
   const handleApplyCoupon = () => {
     setCouponMsg("")
     if (!promoCode) return;
 
     if (promoCode === "WELCOME50") {
-      // 50% off up to 100
       const discount = Math.min(100, Math.floor(totalAmount * 0.5));
       setAppliedDiscount(discount);
       setDiscountLabel("50% OFF");
@@ -68,18 +60,16 @@ function CheckOut() {
       setCouponMsg("Coupon WELCOME50 Applied Successfully!");
     }
     else if (promoCode === "FREEDEL") {
-      // Free Delivery
       if (deliveryFee === 0) {
         setCouponMsg("Free delivery is already applied on orders above ₹500!");
         return;
       }
       setDeliveryDiscount(true);
-      setAppliedDiscount(0); // Only delivery is free
+      setAppliedDiscount(0);
       setDiscountLabel("Free Delivery");
       setCouponMsg("Coupon FREEDEL Applied! Delivery is Free.");
     }
     else if (promoCode === "PARTY20") {
-      // Flat 20% off
       const discount = Math.floor(totalAmount * 0.2);
       setAppliedDiscount(discount);
       setDiscountLabel("20% OFF");
@@ -94,11 +84,10 @@ function CheckOut() {
     }
   }
 
-
   const getCurrentLocation = () => {
     const latitude = userData.location?.coordinates?.[1]
     const longitude = userData.location?.coordinates?.[0]
-    
+
     if (latitude && longitude) {
       dispatch(setLocation({ lat: latitude, lon: longitude }))
       getAddressByLatLng(latitude, longitude)
@@ -168,12 +157,18 @@ function CheckOut() {
       name: "Servio",
       description: "Food Delivery Website",
       order_id: razorOrder.id,
+      prefill: {
+        name: "",
+        email: "",
+        contact: ""
+      },
+      theme: {
+        color: "#ff4d2d"
+      },
       handler: async function (response) {
         try {
-          // Defensive: Razorpay should always include this on successful payments
           if (!response?.razorpay_payment_id) {
             console.error('Razorpay handler missing razorpay_payment_id:', response)
-            // Optionally show UI feedback (keeping scope minimal)
             return;
           }
 
@@ -196,11 +191,8 @@ function CheckOut() {
 
     const rzp = new window.Razorpay(options)
 
-    // Explicit failure handling (prevents silent crashes)
     rzp.on('payment.failed', function (failureResponse) {
       console.error('Razorpay payment failed:', failureResponse)
-      // Minimal UI impact: avoid blocking navigation by crashing
-      // You can replace this with a toast/inline message later.
     })
 
     rzp.open()
@@ -307,7 +299,6 @@ function CheckOut() {
             ))}
             <div className="border-t border-gray-200 my-4"></div>
 
-            {/* Promo Code Input */}
             <div className="flex gap-2">
               <input
                 type="text"
@@ -353,7 +344,6 @@ function CheckOut() {
               </span>
             </div>
 
-            {/* Discount Row */}
             {appliedDiscount > 0 && (
               <div className='flex justify-between font-medium text-green-600 animate-pulse'>
                 <span>Discount ({discountLabel})</span>
